@@ -174,10 +174,119 @@
             color: #2c5282;
         }
 
-        .scheme-info {
+        .rules-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
             font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .rules-button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f56565;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #e53e3e;
+            transform: scale(1.1);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+            cursor: pointer;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            user-select: none;
+            position: relative;
+        }
+
+        .modal-description:hover {
+            background: #e2e8f0;
+        }
+
+        .modal-description:after {
+            content: '🔄 Click to switch language';
+            position: absolute;
+            bottom: -20px;
+            right: 0;
+            font-size: 12px;
             color: #718096;
-            margin-bottom: 10px;
+            font-style: italic;
         }
 
         .loading {
@@ -399,7 +508,7 @@
             <p class="exercise-title">Practice changing subjects while keeping the same verb</p>
             
             <div class="verb-info" id="currentVerb">Current verb: go</div>
-            <div class="scheme-info" id="schemeInfo">Loading...</div>
+            <button class="rules-button" onclick="showRules('present')">📚 Rules</button>
             
             <div class="exercise-container">
                 <div id="sentenceDisplay">
@@ -431,7 +540,7 @@
             <p class="exercise-title">Practice changing subjects with future tense</p>
             
             <div class="verb-info" id="currentVerbFuture">Current verb: go</div>
-            <div class="scheme-info" id="schemeInfoFuture">Loading...</div>
+            <button class="rules-button" onclick="showRules('future')">📚 Rules</button>
             
             <div class="exercise-container">
                 <div id="sentenceDisplayFuture">
@@ -463,7 +572,7 @@
             <p class="exercise-title">Practice changing subjects with past tense</p>
             
             <div class="verb-info" id="currentVerbPast">Current verb: go</div>
-            <div class="scheme-info" id="schemeInfoPast">Loading...</div>
+            <button class="rules-button" onclick="showRules('past')">📚 Rules</button>
             
             <div class="exercise-container">
                 <div id="sentenceDisplayPast">
@@ -495,7 +604,7 @@
             <p class="exercise-title">Practice changing subjects with present perfect tense</p>
             
             <div class="verb-info" id="currentVerbPresentPerfect">Current verb: go</div>
-            <div class="scheme-info" id="schemeInfoPresentPerfect">Loading...</div>
+            <button class="rules-button" onclick="showRules('presentPerfect')">📚 Rules</button>
             
             <div class="exercise-container">
                 <div id="sentenceDisplayPresentPerfect">
@@ -527,7 +636,7 @@
             <p class="exercise-title">Practice changing subjects with past perfect tense</p>
             
             <div class="verb-info" id="currentVerbPastPerfect">Current verb: go</div>
-            <div class="scheme-info" id="schemeInfoPastPerfect">Loading...</div>
+            <button class="rules-button" onclick="showRules('pastPerfect')">📚 Rules</button>
             
             <div class="exercise-container">
                 <div id="sentenceDisplayPastPerfect">
@@ -590,6 +699,93 @@
     </div>
 
     <script>
+        // Russian infinitive forms for all verbs
+        const verbInfinitives = {
+            'be': 'быть',
+            'beat': 'бить',
+            'become': 'становиться',
+            'begin': 'начинать',
+            'break': 'ломать',
+            'bring': 'приносить',
+            'build': 'строить',
+            'buy': 'покупать',
+            'catch': 'ловить',
+            'choose': 'выбирать',
+            'come': 'приходить',
+            'cost': 'стоить',
+            'do': 'делать',
+            'draw': 'рисовать',
+            'dream': 'мечтать',
+            'drink': 'пить',
+            'drive': 'водить, везти',
+            'eat': 'есть',
+            'fall': 'падать',
+            'feel': 'чувствовать',
+            'find': 'находить',
+            'fix': 'чинить',
+            'fly': 'летать',
+            'get': 'получать',
+            'give': 'давать',
+            'go': 'идти, ходить',
+            'grow': 'расти',
+            'have': 'иметь',
+            'hear': 'слышать',
+            'know': 'знать',
+            'learn': 'учиться',
+            'leave': 'оставлять, уходить',
+            'lie': 'лежать',
+            'make': 'делать, создавать',
+            'meet': 'встречать',
+            'play': 'играть',
+            'put': 'класть',
+            'read': 'читать',
+            'run': 'бегать',
+            'say': 'говорить',
+            'see': 'видеть',
+            'seek': 'искать',
+            'show': 'показывать',
+            'sing': 'петь',
+            'sit': 'сидеть',
+            'sleep': 'спать',
+            'speak': 'говорить',
+            'stand': 'стоять',
+            'study': 'учиться, изучать',
+            'swim': 'плавать',
+            'take': 'брать',
+            'teach': 'учить, преподавать',
+            'tell': 'рассказывать',
+            'think': 'думать',
+            'throw': 'бросать',
+            'understand': 'понимать',
+            'work': 'работать',
+            'write': 'писать',
+            'cry': 'плакать'
+        };
+
+        // Tense rules in both languages
+        const tenseRules = {
+            present: {
+                english: "Used for habits, routines, general truths, and scheduled events. It describes actions that happen regularly or are always true.",
+                russian: "Используется для описания привычек, рутинных действий, общих истин и запланированных событий. Описывает действия, которые происходят регулярно или всегда верны."
+            },
+            past: {
+                english: "Used for completed actions in the past, past habits, and actions with a specific time. It describes things that are finished, often with a specific time or date.",
+                russian: "Используется для описания завершенных действий в прошлом, прошлых привычек и действий с указанием конкретного времени в прошлом. Описывает завершенные действия, часто с указанием конкретного времени или даты. События и факты из прошлого, следующие один за другим."
+            },
+            future: {
+                english: "Used for predictions, spontaneous decisions, promises, and scheduled events. It describes actions that will happen in the future, whether planned or not.",
+                russian: "Используется для предсказаний, обещаний и запланированных событий. Описывает действия, которые произойдут в будущем, запланированные или нет."
+            },
+            presentPerfect: {
+                english: "Used for actions that started in the past and continue to the present, actions at an unspecified time, actions connected to the present, and recent actions. It shows a link between the past and the present.",
+                russian: "Используется для действий, начавшихся в прошлом и продолжающихся в настоящем (я прожил здесь 10 лет), обозначения опыта/прецедента (я бывал в Калифорнии) и результат действий на данный момент (я сделал работу). Показывает связь между прошлым и настоящим."
+            },
+            pastPerfect: {
+                english: "Used for actions that happened before another action in the past or before a specific time in the past, and in reported speech. It helps sequence events in the past.",
+                russian: "Используется для действий, произошедших до другого действия в прошлом или до определенного времени в прошлом, а также в косвенной речи. Помогает упорядочить события в прошлом."
+            }
+        };
+
         // Comprehensive Verb Dictionary with added Present Perfect and Past Perfect
         const verbDictionary = {
             // BE verb
@@ -2097,6 +2293,83 @@
         let currentTestData = null;
         let revealStage = 0;
 
+        // State for rules modal
+        let currentRulesLanguage = 'russian';
+        
+        // Function to show rules modal
+        function showRules(tense) {
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.id = 'rulesModal';
+            modalOverlay.onclick = function(e) {
+                if (e.target === modalOverlay) {
+                    closeRules();
+                }
+            };
+            
+            const modalContent = document.createElement('div');
+            modalContent.className = 'modal-content';
+            
+            const closeButton = document.createElement('button');
+            closeButton.className = 'modal-close';
+            closeButton.innerHTML = '×';
+            closeButton.onclick = closeRules;
+            
+            const title = document.createElement('h3');
+            title.className = 'modal-title';
+            
+            let tenseTitle = '';
+            switch(tense) {
+                case 'present':
+                    tenseTitle = 'Present Simple';
+                    break;
+                case 'past':
+                    tenseTitle = 'Past Simple';
+                    break;
+                case 'future':
+                    tenseTitle = 'Future Simple';
+                    break;
+                case 'presentPerfect':
+                    tenseTitle = 'Present Perfect';
+                    break;
+                case 'pastPerfect':
+                    tenseTitle = 'Past Perfect';
+                    break;
+            }
+            title.textContent = tenseTitle + ' Rules';
+            
+            const description = document.createElement('div');
+            description.className = 'modal-description';
+            description.id = 'rulesDescription';
+            description.textContent = tenseRules[tense][currentRulesLanguage];
+            description.onclick = function() {
+                toggleRulesLanguage(tense);
+            };
+            
+            modalContent.appendChild(closeButton);
+            modalContent.appendChild(title);
+            modalContent.appendChild(description);
+            modalOverlay.appendChild(modalContent);
+            
+            document.body.appendChild(modalOverlay);
+            currentRulesLanguage = 'russian'; // Always start with Russian
+        }
+        
+        function closeRules() {
+            const modal = document.getElementById('rulesModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        function toggleRulesLanguage(tense) {
+            currentRulesLanguage = currentRulesLanguage === 'russian' ? 'english' : 'russian';
+            const description = document.getElementById('rulesDescription');
+            if (description) {
+                description.textContent = tenseRules[tense][currentRulesLanguage];
+            }
+        }
+
         // Navigation functions
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
@@ -2168,19 +2441,16 @@
                     document.getElementById('sentencePresentPerfect2').textContent = verbData.negative;
                     document.getElementById('sentencePresentPerfect3').textContent = verbData.question;
                     document.getElementById('sentencePresentPerfect4').textContent = verbData.whQuestion;
-                    
-                    // Update scheme info
-                    const hasForm = ['he', 'she', 'it'].includes(subject) ? 'has' : 'have';
-                    document.getElementById('schemeInfoPresentPerfect').textContent = 
-                        `Present Perfect: ${hasForm} + past participle`;
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
             }
             
-            // Update verb info
-            document.getElementById('currentVerbPresentPerfect').textContent = `Current verb: ${currentVerbPresentPerfect}`;
+            // Update verb info with Russian infinitive
+            const russianInfinitive = verbInfinitives[currentVerbPresentPerfect] || '';
+            document.getElementById('currentVerbPresentPerfect').textContent = 
+                `Current verb: ${currentVerbPresentPerfect} - ${russianInfinitive}`;
         }
 
         function nextSubjectPresentPerfect() {
@@ -2232,16 +2502,16 @@
                     document.getElementById('sentencePastPerfect2').textContent = verbData.negative;
                     document.getElementById('sentencePastPerfect3').textContent = verbData.question;
                     document.getElementById('sentencePastPerfect4').textContent = verbData.whQuestion;
-                    document.getElementById('schemeInfoPastPerfect').textContent = 
-                        'Past Perfect: had + past participle for all subjects';
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
             }
             
-            // Update verb info
-            document.getElementById('currentVerbPastPerfect').textContent = `Current verb: ${currentVerbPastPerfect}`;
+            // Update verb info with Russian infinitive
+            const russianInfinitive = verbInfinitives[currentVerbPastPerfect] || '';
+            document.getElementById('currentVerbPastPerfect').textContent = 
+                `Current verb: ${currentVerbPastPerfect} - ${russianInfinitive}`;
         }
 
         function nextSubjectPastPerfect() {
@@ -2293,15 +2563,16 @@
                     document.getElementById('sentenceFuture2').textContent = verbData.negative;
                     document.getElementById('sentenceFuture3').textContent = verbData.question;
                     document.getElementById('sentenceFuture4').textContent = verbData.whQuestion;
-                    document.getElementById('schemeInfoFuture').textContent = 'Future Simple: will + base verb for all subjects';
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
             }
             
-            // Update verb info
-            document.getElementById('currentVerbFuture').textContent = `Current verb: ${currentVerbFuture}`;
+            // Update verb info with Russian infinitive
+            const russianInfinitive = verbInfinitives[currentVerbFuture] || '';
+            document.getElementById('currentVerbFuture').textContent = 
+                `Current verb: ${currentVerbFuture} - ${russianInfinitive}`;
         }
 
         function nextSubjectFuture() {
@@ -2356,20 +2627,16 @@
                     document.getElementById('sentence2').textContent = verbData.negative;
                     document.getElementById('sentence3').textContent = verbData.question;
                     document.getElementById('sentence4').textContent = verbData.whQuestion;
-                    
-                    // Update scheme info
-                    const isThirdPerson = ['he', 'she', 'it'].includes(subject);
-                    document.getElementById('schemeInfo').textContent = isThirdPerson ? 
-                        'Scheme 2: he/she/it forms (third person singular)' : 
-                        'Scheme 1: I/you/we/they forms';
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
             }
             
-            // Update verb info
-            document.getElementById('currentVerb').textContent = `Current verb: ${currentVerb}`;
+            // Update verb info with Russian infinitive
+            const russianInfinitive = verbInfinitives[currentVerb] || '';
+            document.getElementById('currentVerb').textContent = 
+                `Current verb: ${currentVerb} - ${russianInfinitive}`;
         }
 
         function nextSubject() {
@@ -2424,15 +2691,16 @@
                     document.getElementById('sentencePast2').textContent = verbData.negative;
                     document.getElementById('sentencePast3').textContent = verbData.question;
                     document.getElementById('sentencePast4').textContent = verbData.whQuestion;
-                    document.getElementById('schemeInfoPast').textContent = 'Past Simple: same form for all subjects';
                 }
                 
             } catch (error) {
                 console.error('Error:', error);
             }
             
-            // Update verb info
-            document.getElementById('currentVerbPast').textContent = `Current verb: ${currentVerbPast}`;
+            // Update verb info with Russian infinitive
+            const russianInfinitive = verbInfinitives[currentVerbPast] || '';
+            document.getElementById('currentVerbPast').textContent = 
+                `Current verb: ${currentVerbPast} - ${russianInfinitive}`;
         }
 
         function nextSubjectPast() {
