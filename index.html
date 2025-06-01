@@ -218,12 +218,66 @@
             color: #5a67d8;
             font-weight: bold;
             margin-bottom: 20px;
-            padding: 20px;
+            padding: 30px 20px 20px 20px;
             background: #e6f2ff;
             border-radius: 10px;
             text-align: center;
             display: block !important;
+            position: relative;
         }
+        
+        .tense-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: normal;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            animation: badgeAppear 0.5s ease-out;
+            cursor: default;
+            user-select: none;
+        }
+        
+        @keyframes badgeAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-10px);
+            }
+            50% {
+                transform: scale(1.1) translateY(0);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .tense-badge:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+        }
+        
+        .tense-badge.present { background: #48bb78; }
+        .tense-badge.present:hover { box-shadow: 0 4px 15px rgba(72, 187, 120, 0.5); }
+        
+        .tense-badge.past { background: #f56565; }
+        .tense-badge.past:hover { box-shadow: 0 4px 15px rgba(245, 101, 101, 0.5); }
+        
+        .tense-badge.future { background: #4299e1; }
+        .tense-badge.future:hover { box-shadow: 0 4px 15px rgba(66, 153, 225, 0.5); }
+        
+        .tense-badge.present-perfect { background: #9f7aea; }
+        .tense-badge.present-perfect:hover { box-shadow: 0 4px 15px rgba(159, 122, 234, 0.5); }
+        
+        .tense-badge.past-perfect { background: #ed8936; }
+        .tense-badge.past-perfect:hover { box-shadow: 0 4px 15px rgba(237, 137, 54, 0.5); }
         
         .english {
             font-size: 22px;
@@ -258,7 +312,7 @@
         }
         
         #testContainer:after {
-            content: 'Tap to reveal';
+            content: 'Tap to reveal answer';
             position: absolute;
             bottom: 10px;
             right: 10px;
@@ -287,6 +341,26 @@
             
             .nav-button {
                 margin: 5px;
+            }
+            
+            .tense-badge {
+                animation: badgeAppear 0.5s ease-out, pulseMobile 2s ease-in-out infinite;
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+            
+            .russian {
+                font-size: 24px;
+                padding: 35px 15px 15px 15px;
+            }
+        }
+        
+        @keyframes pulseMobile {
+            0%, 100% {
+                box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                box-shadow: 0 2px 20px rgba(102, 126, 234, 0.6);
             }
         }
     </style>
@@ -482,7 +556,8 @@
         <!-- Test Yourself -->
         <div id="testYourself" class="screen hidden">
             <h2>Test Yourself</h2>
-            <p class="exercise-title">Translate this sentence and put it in the negative, question and wh-question form.<br>Tap the example to see the translation.</p>
+            <p style="font-size: 14px; color: #718096; margin-bottom: 10px;">All 5 tenses: Present Simple, Past Simple, Future Simple, Present Perfect, Past Perfect</p>
+            <p class="exercise-title">Translate this sentence and put it in the negative, question and wh-question form.<br><strong>Pay attention to the tense badge!</strong> The required tense is shown in the colored badge.<br>Tap the example to see the translation.</p>
             
             <div class="exercise-container" id="testContainer" onclick="revealNext()">
                 <div class="test-item">
@@ -499,6 +574,17 @@
             <div class="navigation-buttons">
                 <button class="nav-button" onclick="generateNewTest()">New Example</button>
                 <button class="back-button" onclick="showMainMenu()">Back to Main Menu</button>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 15px; background: #f7fafc; border-radius: 10px; text-align: center;">
+                <p style="font-size: 12px; color: #718096; margin-bottom: 10px;">Tense Color Guide:</p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+                    <span style="background: #48bb78; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px;">Present Simple</span>
+                    <span style="background: #f56565; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px;">Past Simple</span>
+                    <span style="background: #4299e1; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px;">Future Simple</span>
+                    <span style="background: #9f7aea; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px;">Present Perfect</span>
+                    <span style="background: #ed8936; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px;">Past Perfect</span>
+                </div>
             </div>
         </div>
     </div>
@@ -2526,7 +2612,38 @@
             if (verbData) {
                 // Display Russian translation
                 const russianEl = document.getElementById('russianSentence');
-                russianEl.textContent = verbData.russian;
+                
+                // Create tense badge
+                let tenseDisplayName = '';
+                let tenseClass = '';
+                
+                switch(randomTense) {
+                    case 'present':
+                        tenseDisplayName = 'Present Simple';
+                        tenseClass = 'present';
+                        break;
+                    case 'past':
+                        tenseDisplayName = 'Past Simple';
+                        tenseClass = 'past';
+                        break;
+                    case 'future':
+                        tenseDisplayName = 'Future Simple';
+                        tenseClass = 'future';
+                        break;
+                    case 'presentPerfect':
+                        tenseDisplayName = 'Present Perfect';
+                        tenseClass = 'present-perfect';
+                        break;
+                    case 'pastPerfect':
+                        tenseDisplayName = 'Past Perfect';
+                        tenseClass = 'past-perfect';
+                        break;
+                }
+                
+                russianEl.innerHTML = `
+                    <span class="tense-badge ${tenseClass}" aria-label="Use ${tenseDisplayName} tense">⏱ ${tenseDisplayName}</span>
+                    ${verbData.russian}
+                `;
                 russianEl.classList.remove('hidden');
                 russianEl.style.display = 'block';
                 
