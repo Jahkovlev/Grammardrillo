@@ -173,6 +173,7 @@
             font-weight: bold;
             color: #2c5282;
             line-height: 1.6;
+            text-align: center;
         }
 
         .rules-button {
@@ -2501,9 +2502,9 @@
             
             // Update verb info with Russian infinitive and three forms
             const russianInfinitive = verbInfinitives[currentVerbPresentPerfect] || '';
-            const threeFormsDisplay = verbForms[currentVerbPresentPerfect] ? `(${verbForms[currentVerbPresentPerfect]})` : '';
-            document.getElementById('currentVerbPresentPerfect').textContent = 
-                `Current verb: ${currentVerbPresentPerfect} - ${russianInfinitive} ${threeFormsDisplay}`;
+            const threeFormsDisplay = verbForms[currentVerbPresentPerfect] ? `<br>(${verbForms[currentVerbPresentPerfect]})` : '';
+            document.getElementById('currentVerbPresentPerfect').innerHTML = 
+                `Current verb: ${currentVerbPresentPerfect} - ${russianInfinitive}${threeFormsDisplay}`;
         }
 
         function nextSubjectPresentPerfect() {
@@ -2563,9 +2564,9 @@
             
             // Update verb info with Russian infinitive and three forms
             const russianInfinitive = verbInfinitives[currentVerbPastPerfect] || '';
-            const threeFormsDisplay = verbForms[currentVerbPastPerfect] ? `(${verbForms[currentVerbPastPerfect]})` : '';
-            document.getElementById('currentVerbPastPerfect').textContent = 
-                `Current verb: ${currentVerbPastPerfect} - ${russianInfinitive} ${threeFormsDisplay}`;
+            const threeFormsDisplay = verbForms[currentVerbPastPerfect] ? `<br>(${verbForms[currentVerbPastPerfect]})` : '';
+            document.getElementById('currentVerbPastPerfect').innerHTML = 
+                `Current verb: ${currentVerbPastPerfect} - ${russianInfinitive}${threeFormsDisplay}`;
         }
 
         function nextSubjectPastPerfect() {
@@ -2625,9 +2626,9 @@
             
             // Update verb info with Russian infinitive and three forms
             const russianInfinitive = verbInfinitives[currentVerbFuture] || '';
-            const threeFormsDisplay = verbForms[currentVerbFuture] ? `(${verbForms[currentVerbFuture]})` : '';
-            document.getElementById('currentVerbFuture').textContent = 
-                `Current verb: ${currentVerbFuture} - ${russianInfinitive} ${threeFormsDisplay}`;
+            const threeFormsDisplay = verbForms[currentVerbFuture] ? `<br>(${verbForms[currentVerbFuture]})` : '';
+            document.getElementById('currentVerbFuture').innerHTML = 
+                `Current verb: ${currentVerbFuture} - ${russianInfinitive}${threeFormsDisplay}`;
         }
 
         function nextSubjectFuture() {
@@ -2690,9 +2691,9 @@
             
             // Update verb info with Russian infinitive and three forms
             const russianInfinitive = verbInfinitives[currentVerb] || '';
-            const threeFormsDisplay = verbForms[currentVerb] ? `(${verbForms[currentVerb]})` : '';
-            document.getElementById('currentVerb').textContent = 
-                `Current verb: ${currentVerb} - ${russianInfinitive} ${threeFormsDisplay}`;
+            const threeFormsDisplay = verbForms[currentVerb] ? `<br>(${verbForms[currentVerb]})` : '';
+            document.getElementById('currentVerb').innerHTML = 
+                `Current verb: ${currentVerb} - ${russianInfinitive}${threeFormsDisplay}`;
         }
 
         function nextSubject() {
@@ -2755,9 +2756,9 @@
             
             // Update verb info with Russian infinitive and three forms
             const russianInfinitive = verbInfinitives[currentVerbPast] || '';
-            const threeFormsDisplay = verbForms[currentVerbPast] ? `(${verbForms[currentVerbPast]})` : '';
-            document.getElementById('currentVerbPast').textContent = 
-                `Current verb: ${currentVerbPast} - ${russianInfinitive} ${threeFormsDisplay}`;
+            const threeFormsDisplay = verbForms[currentVerbPast] ? `<br>(${verbForms[currentVerbPast]})` : '';
+            document.getElementById('currentVerbPast').innerHTML = 
+                `Current verb: ${currentVerbPast} - ${russianInfinitive}${threeFormsDisplay}`;
         }
 
         function nextSubjectPast() {
