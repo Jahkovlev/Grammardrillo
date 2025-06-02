@@ -172,6 +172,7 @@
             margin-bottom: 15px;
             font-weight: bold;
             color: #2c5282;
+            line-height: 1.6;
         }
 
         .rules-button {
@@ -665,8 +666,7 @@
         <!-- Test Yourself -->
         <div id="testYourself" class="screen hidden">
             <h2>Test Yourself</h2>
-            <p style="font-size: 14px; color: #718096; margin-bottom: 10px;">All 5 tenses: Present Simple, Past Simple, Future Simple, Present Perfect, Past Perfect</p>
-            <p class="exercise-title">Translate this sentence and put it in the negative, question and wh-question form.<br><strong>Pay attention to the tense badge!</strong> The required tense is shown in the colored badge.<br>Tap the example to see the translation.</p>
+            <p class="exercise-title">Переведи предложение и сделай из него отрицание, вопрос и wh-вопрос. Клик, чтобы проверить себя.</p>
             
             <div class="exercise-container" id="testContainer" onclick="revealNext()">
                 <div class="test-item">
@@ -683,17 +683,6 @@
             <div class="navigation-buttons">
                 <button class="nav-button" onclick="generateNewTest()">New Example</button>
                 <button class="back-button" onclick="showMainMenu()">Back to Main Menu</button>
-            </div>
-            
-            <div style="margin-top: 30px; padding: 15px; background: #f7fafc; border-radius: 10px; text-align: center;">
-                <p style="font-size: 12px; color: #718096; margin-bottom: 10px;">Tense Color Guide:</p>
-                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-                    <span style="background: #48bb78; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px;">Present Simple</span>
-                    <span style="background: #f56565; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px;">Past Simple</span>
-                    <span style="background: #4299e1; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px;">Future Simple</span>
-                    <span style="background: #9f7aea; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px;">Present Perfect</span>
-                    <span style="background: #ed8936; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px;">Past Perfect</span>
-                </div>
             </div>
         </div>
     </div>
@@ -760,6 +749,69 @@
             'work': 'работать',
             'write': 'писать',
             'cry': 'плакать'
+        };
+
+        // Three forms of verbs (infinitive - past simple - past participle)
+        const verbForms = {
+            'be': 'be-was/were-been',
+            'beat': 'beat-beat-beaten',
+            'become': 'become-became-become',
+            'begin': 'begin-began-begun',
+            'break': 'break-broke-broken',
+            'bring': 'bring-brought-brought',
+            'build': 'build-built-built',
+            'buy': 'buy-bought-bought',
+            'catch': 'catch-caught-caught',
+            'choose': 'choose-chose-chosen',
+            'come': 'come-came-come',
+            'cost': 'cost-cost-cost',
+            'do': 'do-did-done',
+            'draw': 'draw-drew-drawn',
+            'dream': 'dream-dreamt-dreamt',
+            'drink': 'drink-drank-drunk',
+            'drive': 'drive-drove-driven',
+            'eat': 'eat-ate-eaten',
+            'fall': 'fall-fell-fallen',
+            'feel': 'feel-felt-felt',
+            'find': 'find-found-found',
+            'fix': 'fix-fixed-fixed',
+            'fly': 'fly-flew-flown',
+            'get': 'get-got-got',
+            'give': 'give-gave-given',
+            'go': 'go-went-gone',
+            'grow': 'grow-grew-grown',
+            'have': 'have-had-had',
+            'hear': 'hear-heard-heard',
+            'know': 'know-knew-known',
+            'learn': 'learn-learnt-learnt',
+            'leave': 'leave-left-left',
+            'lie': 'lie-lay-lain',
+            'make': 'make-made-made',
+            'meet': 'meet-met-met',
+            'play': 'play-played-played',
+            'put': 'put-put-put',
+            'read': 'read-read-read',
+            'run': 'run-ran-run',
+            'say': 'say-said-said',
+            'see': 'see-saw-seen',
+            'seek': 'seek-sought-sought',
+            'show': 'show-showed-shown',
+            'sing': 'sing-sang-sung',
+            'sit': 'sit-sat-sat',
+            'sleep': 'sleep-slept-slept',
+            'speak': 'speak-spoke-spoken',
+            'stand': 'stand-stood-stood',
+            'study': 'study-studied-studied',
+            'swim': 'swim-swam-swum',
+            'take': 'take-took-taken',
+            'teach': 'teach-taught-taught',
+            'tell': 'tell-told-told',
+            'think': 'think-thought-thought',
+            'throw': 'throw-threw-thrown',
+            'understand': 'understand-understood-understood',
+            'work': 'work-worked-worked',
+            'write': 'write-wrote-written',
+            'cry': 'cry-cried-cried'
         };
 
         // Tense rules in both languages
@@ -2447,10 +2499,11 @@
                 console.error('Error:', error);
             }
             
-            // Update verb info with Russian infinitive
+            // Update verb info with Russian infinitive and three forms
             const russianInfinitive = verbInfinitives[currentVerbPresentPerfect] || '';
+            const threeFormsDisplay = verbForms[currentVerbPresentPerfect] ? `(${verbForms[currentVerbPresentPerfect]})` : '';
             document.getElementById('currentVerbPresentPerfect').textContent = 
-                `Current verb: ${currentVerbPresentPerfect} - ${russianInfinitive}`;
+                `Current verb: ${currentVerbPresentPerfect} - ${russianInfinitive} ${threeFormsDisplay}`;
         }
 
         function nextSubjectPresentPerfect() {
@@ -2508,10 +2561,11 @@
                 console.error('Error:', error);
             }
             
-            // Update verb info with Russian infinitive
+            // Update verb info with Russian infinitive and three forms
             const russianInfinitive = verbInfinitives[currentVerbPastPerfect] || '';
+            const threeFormsDisplay = verbForms[currentVerbPastPerfect] ? `(${verbForms[currentVerbPastPerfect]})` : '';
             document.getElementById('currentVerbPastPerfect').textContent = 
-                `Current verb: ${currentVerbPastPerfect} - ${russianInfinitive}`;
+                `Current verb: ${currentVerbPastPerfect} - ${russianInfinitive} ${threeFormsDisplay}`;
         }
 
         function nextSubjectPastPerfect() {
@@ -2569,10 +2623,11 @@
                 console.error('Error:', error);
             }
             
-            // Update verb info with Russian infinitive
+            // Update verb info with Russian infinitive and three forms
             const russianInfinitive = verbInfinitives[currentVerbFuture] || '';
+            const threeFormsDisplay = verbForms[currentVerbFuture] ? `(${verbForms[currentVerbFuture]})` : '';
             document.getElementById('currentVerbFuture').textContent = 
-                `Current verb: ${currentVerbFuture} - ${russianInfinitive}`;
+                `Current verb: ${currentVerbFuture} - ${russianInfinitive} ${threeFormsDisplay}`;
         }
 
         function nextSubjectFuture() {
@@ -2633,10 +2688,11 @@
                 console.error('Error:', error);
             }
             
-            // Update verb info with Russian infinitive
+            // Update verb info with Russian infinitive and three forms
             const russianInfinitive = verbInfinitives[currentVerb] || '';
+            const threeFormsDisplay = verbForms[currentVerb] ? `(${verbForms[currentVerb]})` : '';
             document.getElementById('currentVerb').textContent = 
-                `Current verb: ${currentVerb} - ${russianInfinitive}`;
+                `Current verb: ${currentVerb} - ${russianInfinitive} ${threeFormsDisplay}`;
         }
 
         function nextSubject() {
@@ -2697,10 +2753,11 @@
                 console.error('Error:', error);
             }
             
-            // Update verb info with Russian infinitive
+            // Update verb info with Russian infinitive and three forms
             const russianInfinitive = verbInfinitives[currentVerbPast] || '';
+            const threeFormsDisplay = verbForms[currentVerbPast] ? `(${verbForms[currentVerbPast]})` : '';
             document.getElementById('currentVerbPast').textContent = 
-                `Current verb: ${currentVerbPast} - ${russianInfinitive}`;
+                `Current verb: ${currentVerbPast} - ${russianInfinitive} ${threeFormsDisplay}`;
         }
 
         function nextSubjectPast() {
