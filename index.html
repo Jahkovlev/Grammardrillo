@@ -1192,7 +1192,7 @@
                 'buy': { base: 'купил', f: 'купила', n: 'купило', pl: 'купили' },
                 'catch': { base: 'поймал', f: 'поймала', n: 'поймало', pl: 'поймали' },
                 'choose': { base: 'выбрал', f: 'выбрала', n: 'выбрало', pl: 'выбрали' },
-                'come': { base: 'пришёл', f: 'пришла', n: 'пришло', pl: 'пришли' },
+                'cost': { base: 'стоил', f: 'стоила', n: 'стоило', pl: 'стоили' },
                 'cost': { base: 'стоил', f: 'стоила', n: 'стоило', pl: 'стоили' },
                 'do': { base: 'делал', f: 'делала', n: 'делало', pl: 'делали' },
                 'draw': { base: 'рисовал', f: 'рисовала', n: 'рисовало', pl: 'рисовали' },
@@ -1785,7 +1785,7 @@
                     negative: `${subject} ${beNeg} ${ingForm}`,
                     question: `${beQuestion} ${subject} ${ingForm}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `${whAux} ${subject}`, ingForm),
-                    russian: getRussianPresent(verb, subject) + ' (сейчас)'
+                    russian: getRussianContinuous(verb, subject, 'presentContinuous')
                 };
             });
             
@@ -1806,7 +1806,7 @@
                     negative: `${subject} ${wasWereNeg} ${ingForm}`,
                     question: `${wasWereQuestion} ${subject} ${ingForm}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `${wasWere} ${subject}`, ingForm),
-                    russian: getRussianPast(verb, subject) + ' (в тот момент)'
+                    russian: getRussianContinuous(verb, subject, 'pastContinuous')
                 };
             });
             
@@ -1823,7 +1823,7 @@
                     negative: `${subject} won't be ${ingForm}`,
                     question: `Will ${subject} be ${ingForm}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `will ${subject} be`, ingForm),
-                    russian: getRussianFuture(verb, subject) + ' (в тот момент)'
+                    russian: getRussianContinuous(verb, subject, 'futureContinuous')
                 };
             });
             
@@ -1843,7 +1843,7 @@
                     negative: `${subject} ${auxNeg} been ${ingForm}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} been ${ingForm}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `${aux} ${subject} been`, ingForm),
-                    russian: getRussianPresent(verb, subject) + ' (уже какое-то время)'
+                    russian: getRussianContinuous(verb, subject, 'presentPerfectContinuous')
                 };
             });
             
@@ -1860,7 +1860,7 @@
                     negative: `${subject} hadn't been ${ingForm}`,
                     question: `Had ${subject} been ${ingForm}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `had ${subject} been`, ingForm),
-                    russian: getRussianPast(verb, subject) + ' (до того момента)'
+                    russian: getRussianContinuous(verb, subject, 'pastPerfectContinuous')
                 };
             });
             
@@ -2120,8 +2120,8 @@
                     'she': 'она чинит', 'it': 'оно чинит', 'we': 'мы чиним', 'they': 'они чинят'
                 },
                 'cost': {
-                    'I': 'Я стою', 'you': 'ты стоишь', 'he': 'он стоит',
-                    'she': 'она стоит', 'it': 'оно стоит', 'we': 'мы стоим', 'they': 'они стоят'
+                    'I': 'Это стоит', 'you': 'Это стоит', 'he': 'Это стоит',
+                    'she': 'Это стоит', 'it': 'Это стоит', 'we': 'Это стоит', 'they': 'Это стоит'
                 },
                 'dream': {
                     'I': 'Я мечтаю', 'you': 'ты мечтаешь', 'he': 'он мечтает',
@@ -2195,6 +2195,25 @@
             };
             
             return `${pronouns[subject]} ${futureHelper[subject]} ${data.verbInfinitives[verb] || verb}`;
+        }
+        
+        function getRussianContinuous(verb, subject, tense) {
+            const base = getRussianPresent(verb, subject);
+            const modifiers = {
+                'presentContinuous': ' (сейчас)',
+                'pastContinuous': ' (в тот момент)',
+                'futureContinuous': ' (в тот момент)',
+                'presentPerfectContinuous': ' (уже какое-то время)',
+                'pastPerfectContinuous': ' (до того момента)'
+            };
+            
+            if (tense === 'pastContinuous' || tense === 'pastPerfectContinuous') {
+                return getRussianPast(verb, subject) + (modifiers[tense] || '');
+            } else if (tense === 'futureContinuous') {
+                return getRussianFuture(verb, subject) + (modifiers[tense] || '');
+            }
+            
+            return base + (modifiers[tense] || '');
         }
 
         // Initialize app
