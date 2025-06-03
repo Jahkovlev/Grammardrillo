@@ -1119,38 +1119,175 @@
         const utils = {
             // Get -ing form of verb
             getIngForm(verb) {
-                const ingForms = {
+                // Special cases dictionary
+                const specialForms = {
                     'be': 'being',
                     'die': 'dying',
                     'lie': 'lying',
-                    'tie': 'tying'
+                    'tie': 'tying',
+                    'see': 'seeing',
+                    'flee': 'fleeing',
+                    'free': 'freeing',
+                    'agree': 'agreeing',
+                    'dye': 'dyeing',
+                    'hoe': 'hoeing',
+                    'shoe': 'shoeing',
+                    'canoe': 'canoeing',
+                    'eye': 'eyeing'
                 };
                 
-                if (ingForms[verb]) return ingForms[verb];
+                if (specialForms[verb]) return specialForms[verb];
                 
-                // Rule: CVC pattern doubles consonant
-                if (verb.match(/^[^aeiou][aeiou][^aeiou]$/)) {
-                    return verb + verb[verb.length - 1] + 'ing';
+                // Double final consonant cases
+                const doubleConsonant = {
+                    'begin': 'beginning',
+                    'swim': 'swimming',
+                    'run': 'running',
+                    'sit': 'sitting',
+                    'put': 'putting',
+                    'get': 'getting',
+                    'stop': 'stopping',
+                    'plan': 'planning',
+                    'forget': 'forgetting',
+                    'prefer': 'preferring',
+                    'permit': 'permitting',
+                    'regret': 'regretting',
+                    'admit': 'admitting',
+                    'occur': 'occurring',
+                    'refer': 'referring',
+                    'transfer': 'transferring',
+                    'control': 'controlling',
+                    'travel': 'travelling'
+                };
+                
+                if (doubleConsonant[verb]) return doubleConsonant[verb];
+                
+                // Rule: -ie ending changes to -ying
+                if (verb.endsWith('ie')) {
+                    return verb.slice(0, -2) + 'ying';
                 }
                 
-                // Rule: -e ending
+                // Rule: -e ending (but not -ee, -oe, -ye)
                 if (verb.endsWith('e') && !verb.endsWith('ee') && 
                     !verb.endsWith('oe') && !verb.endsWith('ye')) {
                     return verb.slice(0, -1) + 'ing';
                 }
                 
-                // Rule: -ie ending
-                if (verb.endsWith('ie')) {
-                    return verb.slice(0, -2) + 'ying';
+                // Rule: -y ending stays
+                if (verb.endsWith('y')) {
+                    return verb + 'ing';
                 }
                 
-                // Double consonant for stressed syllable endings
-                const doubleConsonant = ['begin', 'swim', 'run', 'sit', 'put', 'get'];
-                if (doubleConsonant.includes(verb)) {
-                    return verb + verb[verb.length - 1] + 'ing';
-                }
-                
+                // Default: just add -ing
                 return verb + 'ing';
+            },
+            
+            // Get appropriate wh-question word based on verb
+            getWhQuestionWord(verb, tense) {
+                const whQuestions = {
+                    // Movement verbs
+                    'go': 'Where',
+                    'come': 'Where',
+                    'run': 'Where',
+                    'walk': 'Where',
+                    'fly': 'Where',
+                    'drive': 'Where',
+                    'swim': 'Where',
+                    'leave': 'Where',
+                    
+                    // Action/creation verbs
+                    'do': 'What',
+                    'make': 'What',
+                    'build': 'What',
+                    'create': 'What',
+                    'draw': 'What',
+                    'write': 'What',
+                    'cook': 'What',
+                    'eat': 'What',
+                    'drink': 'What',
+                    'buy': 'What',
+                    'sell': 'What',
+                    'bring': 'What',
+                    'take': 'What',
+                    'give': 'What',
+                    'get': 'What',
+                    'find': 'What',
+                    'lose': 'What',
+                    'break': 'What',
+                    'fix': 'What',
+                    'choose': 'What',
+                    
+                    // Communication verbs
+                    'say': 'What',
+                    'tell': 'What',
+                    'speak': 'What language',
+                    'talk': 'What about',
+                    
+                    // Perception verbs
+                    'see': 'What',
+                    'hear': 'What',
+                    'feel': 'How',
+                    'smell': 'What',
+                    'taste': 'What',
+                    
+                    // Time-based verbs
+                    'wait': 'Who for',
+                    'sleep': 'Where',
+                    'wake': 'What time',
+                    'start': 'What',
+                    'begin': 'What',
+                    'finish': 'What',
+                    'end': 'What',
+                    
+                    // Cognitive verbs
+                    'think': 'What about',
+                    'know': 'What',
+                    'understand': 'What',
+                    'learn': 'What',
+                    'teach': 'What',
+                    'study': 'What',
+                    'read': 'What',
+                    
+                    // State/condition verbs
+                    'be': 'Who',
+                    'become': 'What',
+                    'seem': 'How',
+                    'appear': 'How',
+                    'look': 'How',
+                    'sound': 'How',
+                    
+                    // Social verbs
+                    'meet': 'Who',
+                    'work': 'Where',
+                    'play': 'What',
+                    'live': 'Where',
+                    'stay': 'Where',
+                    
+                    // Other verbs
+                    'cost': 'How much',
+                    'stand': 'Where',
+                    'sit': 'Where',
+                    'lie': 'Where',
+                    'fall': 'Where',
+                    'grow': 'How',
+                    'throw': 'What',
+                    'catch': 'What',
+                    'seek': 'What',
+                    'show': 'What',
+                    'put': 'Where',
+                    'have': 'What',
+                    'sing': 'What',
+                    'cry': 'Why',
+                    'beat': 'Who',
+                    'dream': 'What about'
+                };
+                
+                // For continuous tenses with duration focus
+                if (tense && (tense.includes('PerfectContinuous'))) {
+                    return 'How long';
+                }
+                
+                return whQuestions[verb] || 'What';
             },
             
             // Get past participle
@@ -1226,7 +1363,7 @@
                         'you': { positive: 'you are', negative: 'you are not', question: 'Are you?', whQuestion: 'Who are you?', russian: 'ты есть' },
                         'he': { positive: 'he is', negative: 'he is not', question: 'Is he?', whQuestion: 'Who is he?', russian: 'он есть' },
                         'she': { positive: 'she is', negative: 'she is not', question: 'Is she?', whQuestion: 'Who is she?', russian: 'она есть' },
-                        'it': { positive: 'it is', negative: 'it is not', question: 'Is it?', whQuestion: 'Who is it?', russian: 'оно есть' },
+                        'it': { positive: 'it is', negative: 'it is not', question: 'Is it?', whQuestion: 'What is it?', russian: 'оно есть' },
                         'we': { positive: 'we are', negative: 'we are not', question: 'Are we?', whQuestion: 'Who are we?', russian: 'мы есть' },
                         'they': { positive: 'they are', negative: 'they are not', question: 'Are they?', whQuestion: 'Who are they?', russian: 'они есть' }
                     },
@@ -1235,9 +1372,81 @@
                         'you': { positive: 'you were', negative: 'you were not', question: 'Were you?', whQuestion: 'Who were you?', russian: 'ты был/была' },
                         'he': { positive: 'he was', negative: 'he was not', question: 'Was he?', whQuestion: 'Who was he?', russian: 'он был' },
                         'she': { positive: 'she was', negative: 'she was not', question: 'Was she?', whQuestion: 'Who was she?', russian: 'она была' },
-                        'it': { positive: 'it was', negative: 'it was not', question: 'Was it?', whQuestion: 'Who was it?', russian: 'оно было' },
+                        'it': { positive: 'it was', negative: 'it was not', question: 'Was it?', whQuestion: 'What was it?', russian: 'оно было' },
                         'we': { positive: 'we were', negative: 'we were not', question: 'Were we?', whQuestion: 'Who were we?', russian: 'мы были' },
                         'they': { positive: 'they were', negative: 'they were not', question: 'Were they?', whQuestion: 'Who were they?', russian: 'они были' }
+                    },
+                    future: {
+                        'I': { positive: 'I will be', negative: 'I will not be', question: 'Will I be?', whQuestion: 'Who will I be?', russian: 'Я буду' },
+                        'you': { positive: 'you will be', negative: 'you will not be', question: 'Will you be?', whQuestion: 'Who will you be?', russian: 'ты будешь' },
+                        'he': { positive: 'he will be', negative: 'he will not be', question: 'Will he be?', whQuestion: 'Who will he be?', russian: 'он будет' },
+                        'she': { positive: 'she will be', negative: 'she will not be', question: 'Will she be?', whQuestion: 'Who will she be?', russian: 'она будет' },
+                        'it': { positive: 'it will be', negative: 'it will not be', question: 'Will it be?', whQuestion: 'What will it be?', russian: 'оно будет' },
+                        'we': { positive: 'we will be', negative: 'we will not be', question: 'Will we be?', whQuestion: 'Who will we be?', russian: 'мы будем' },
+                        'they': { positive: 'they will be', negative: 'they will not be', question: 'Will they be?', whQuestion: 'Who will they be?', russian: 'они будут' }
+                    },
+                    presentPerfect: {
+                        'I': { positive: 'I have been', negative: "I haven't been", question: 'Have I been?', whQuestion: 'Where have I been?', russian: 'Я был/была' },
+                        'you': { positive: 'you have been', negative: "you haven't been", question: 'Have you been?', whQuestion: 'Where have you been?', russian: 'ты был/была' },
+                        'he': { positive: 'he has been', negative: "he hasn't been", question: 'Has he been?', whQuestion: 'Where has he been?', russian: 'он был' },
+                        'she': { positive: 'she has been', negative: "she hasn't been", question: 'Has she been?', whQuestion: 'Where has she been?', russian: 'она была' },
+                        'it': { positive: 'it has been', negative: "it hasn't been", question: 'Has it been?', whQuestion: 'What has it been?', russian: 'оно было' },
+                        'we': { positive: 'we have been', negative: "we haven't been", question: 'Have we been?', whQuestion: 'Where have we been?', russian: 'мы были' },
+                        'they': { positive: 'they have been', negative: "they haven't been", question: 'Have they been?', whQuestion: 'Where have they been?', russian: 'они были' }
+                    },
+                    pastPerfect: {
+                        'I': { positive: 'I had been', negative: "I hadn't been", question: 'Had I been?', whQuestion: 'Where had I been?', russian: 'Я был/была (до того)' },
+                        'you': { positive: 'you had been', negative: "you hadn't been", question: 'Had you been?', whQuestion: 'Where had you been?', russian: 'ты был/была (до того)' },
+                        'he': { positive: 'he had been', negative: "he hadn't been", question: 'Had he been?', whQuestion: 'Where had he been?', russian: 'он был (до того)' },
+                        'she': { positive: 'she had been', negative: "she hadn't been", question: 'Had she been?', whQuestion: 'Where had she been?', russian: 'она была (до того)' },
+                        'it': { positive: 'it had been', negative: "it hadn't been", question: 'Had it been?', whQuestion: 'What had it been?', russian: 'оно было (до того)' },
+                        'we': { positive: 'we had been', negative: "we hadn't been", question: 'Had we been?', whQuestion: 'Where had we been?', russian: 'мы были (до того)' },
+                        'they': { positive: 'they had been', negative: "they hadn't been", question: 'Had they been?', whQuestion: 'Where had they been?', russian: 'они были (до того)' }
+                    },
+                    presentContinuous: {
+                        'I': { positive: 'I am being', negative: 'I am not being', question: 'Am I being?', whQuestion: 'How am I being?', russian: 'Я есть (сейчас)' },
+                        'you': { positive: 'you are being', negative: 'you are not being', question: 'Are you being?', whQuestion: 'How are you being?', russian: 'ты есть (сейчас)' },
+                        'he': { positive: 'he is being', negative: 'he is not being', question: 'Is he being?', whQuestion: 'How is he being?', russian: 'он есть (сейчас)' },
+                        'she': { positive: 'she is being', negative: 'she is not being', question: 'Is she being?', whQuestion: 'How is she being?', russian: 'она есть (сейчас)' },
+                        'it': { positive: 'it is being', negative: 'it is not being', question: 'Is it being?', whQuestion: 'How is it being?', russian: 'оно есть (сейчас)' },
+                        'we': { positive: 'we are being', negative: 'we are not being', question: 'Are we being?', whQuestion: 'How are we being?', russian: 'мы есть (сейчас)' },
+                        'they': { positive: 'they are being', negative: 'they are not being', question: 'Are they being?', whQuestion: 'How are they being?', russian: 'они есть (сейчас)' }
+                    },
+                    pastContinuous: {
+                        'I': { positive: 'I was being', negative: 'I was not being', question: 'Was I being?', whQuestion: 'How was I being?', russian: 'Я был/была (в тот момент)' },
+                        'you': { positive: 'you were being', negative: 'you were not being', question: 'Were you being?', whQuestion: 'How were you being?', russian: 'ты был/была (в тот момент)' },
+                        'he': { positive: 'he was being', negative: 'he was not being', question: 'Was he being?', whQuestion: 'How was he being?', russian: 'он был (в тот момент)' },
+                        'she': { positive: 'she was being', negative: 'she was not being', question: 'Was she being?', whQuestion: 'How was she being?', russian: 'она была (в тот момент)' },
+                        'it': { positive: 'it was being', negative: 'it was not being', question: 'Was it being?', whQuestion: 'How was it being?', russian: 'оно было (в тот момент)' },
+                        'we': { positive: 'we were being', negative: 'we were not being', question: 'Were we being?', whQuestion: 'How were we being?', russian: 'мы были (в тот момент)' },
+                        'they': { positive: 'they were being', negative: 'they were not being', question: 'Were they being?', whQuestion: 'How were they being?', russian: 'они были (в тот момент)' }
+                    },
+                    futureContinuous: {
+                        'I': { positive: 'I will be being', negative: "I won't be being", question: 'Will I be being?', whQuestion: 'How will I be being?', russian: 'Я буду (в тот момент)' },
+                        'you': { positive: 'you will be being', negative: "you won't be being", question: 'Will you be being?', whQuestion: 'How will you be being?', russian: 'ты будешь (в тот момент)' },
+                        'he': { positive: 'he will be being', negative: "he won't be being", question: 'Will he be being?', whQuestion: 'How will he be being?', russian: 'он будет (в тот момент)' },
+                        'she': { positive: 'she will be being', negative: "she won't be being", question: 'Will she be being?', whQuestion: 'How will she be being?', russian: 'она будет (в тот момент)' },
+                        'it': { positive: 'it will be being', negative: "it won't be being", question: 'Will it be being?', whQuestion: 'How will it be being?', russian: 'оно будет (в тот момент)' },
+                        'we': { positive: 'we will be being', negative: "we won't be being", question: 'Will we be being?', whQuestion: 'How will we be being?', russian: 'мы будем (в тот момент)' },
+                        'they': { positive: 'they will be being', negative: "they won't be being", question: 'Will they be being?', whQuestion: 'How will they be being?', russian: 'они будут (в тот момент)' }
+                    },
+                    presentPerfectContinuous: {
+                        'I': { positive: 'I have been being', negative: "I haven't been being", question: 'Have I been being?', whQuestion: 'How long have I been being?', russian: 'Я есть (уже какое-то время)' },
+                        'you': { positive: 'you have been being', negative: "you haven't been being", question: 'Have you been being?', whQuestion: 'How long have you been being?', russian: 'ты есть (уже какое-то время)' },
+                        'he': { positive: 'he has been being', negative: "he hasn't been being", question: 'Has he been being?', whQuestion: 'How long has he been being?', russian: 'он есть (уже какое-то время)' },
+                        'she': { positive: 'she has been being', negative: "she hasn't been being", question: 'Has she been being?', whQuestion: 'How long has she been being?', russian: 'она есть (уже какое-то время)' },
+                        'it': { positive: 'it has been being', negative: "it hasn't been being", question: 'Has it been being?', whQuestion: 'How long has it been being?', russian: 'оно есть (уже какое-то время)' },
+                        'we': { positive: 'we have been being', negative: "we haven't been being", question: 'Have we been being?', whQuestion: 'How long have we been being?', russian: 'мы есть (уже какое-то время)' },
+                        'they': { positive: 'they have been being', negative: "they haven't been being", question: 'Have they been being?', whQuestion: 'How long have they been being?', russian: 'они есть (уже какое-то время)' }
+                    },
+                    pastPerfectContinuous: {
+                        'I': { positive: 'I had been being', negative: "I hadn't been being", question: 'Had I been being?', whQuestion: 'How long had I been being?', russian: 'Я был/была (до того момента)' },
+                        'you': { positive: 'you had been being', negative: "you hadn't been being", question: 'Had you been being?', whQuestion: 'How long had you been being?', russian: 'ты был/была (до того момента)' },
+                        'he': { positive: 'he had been being', negative: "he hadn't been being", question: 'Had he been being?', whQuestion: 'How long had he been being?', russian: 'он был (до того момента)' },
+                        'she': { positive: 'she had been being', negative: "she hadn't been being", question: 'Had she been being?', whQuestion: 'How long had she been being?', russian: 'она была (до того момента)' },
+                        'it': { positive: 'it had been being', negative: "it hadn't been being", question: 'Had it been being?', whQuestion: 'How long had it been being?', russian: 'оно было (до того момента)' },
+                        'we': { positive: 'we had been being', negative: "we hadn't been being", question: 'Had we been being?', whQuestion: 'How long had we been being?', russian: 'мы были (до того момента)' },
+                        'they': { positive: 'they had been being', negative: "they hadn't been being", question: 'Had they been being?', whQuestion: 'How long had they been being?', russian: 'они были (до того момента)' }
                     }
                 },
                 'go': {
@@ -1310,11 +1519,15 @@
             }
             
             const result = {};
-            const thirdPerson = verb.endsWith('s') || verb.endsWith('sh') || 
-                              verb.endsWith('ch') || verb.endsWith('x') || 
-                              verb.endsWith('o') ? verb + 'es' : 
+            const thirdPerson = verb.endsWith('s') || verb.endsWith('ss') || 
+                              verb.endsWith('sh') || verb.endsWith('ch') || 
+                              verb.endsWith('x') || verb.endsWith('z') ||
+                              (verb.endsWith('o') && !['go', 'do'].includes(verb)) ? verb + 'es' : 
                               verb.endsWith('y') && !/[aeiou]y$/.test(verb) ? 
-                              verb.slice(0, -1) + 'ies' : verb + 's';
+                              verb.slice(0, -1) + 'ies' : 
+                              ['go', 'do'].includes(verb) ? verb + 'es' : verb + 's';
+            
+            const whWord = utils.getWhQuestionWord(verb);
             
             data.allSubjects.forEach(subject => {
                 const base = ['he', 'she', 'it'].includes(subject) ? thirdPerson : verb;
@@ -1325,7 +1538,7 @@
                     positive: `${subject} ${base}`,
                     negative: `${subject} ${auxNeg} ${verb}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} ${verb}?`,
-                    whQuestion: `What ${aux} ${subject} ${verb}?`,
+                    whQuestion: `${whWord} ${aux} ${subject} ${verb}?`,
                     russian: getRussianPresent(verb, subject)
                 };
             });
@@ -1340,13 +1553,14 @@
             
             const result = {};
             const pastForm = getPastForm(verb);
+            const whWord = utils.getWhQuestionWord(verb);
             
             data.allSubjects.forEach(subject => {
                 result[subject] = {
                     positive: `${subject} ${pastForm}`,
                     negative: `${subject} didn't ${verb}`,
                     question: `Did ${subject} ${verb}?`,
-                    whQuestion: `What did ${subject} ${verb}?`,
+                    whQuestion: `${whWord} did ${subject} ${verb}?`,
                     russian: getRussianPast(verb, subject)
                 };
             });
@@ -1356,13 +1570,14 @@
 
         function generateFutureSimple(verb) {
             const result = {};
+            const whWord = utils.getWhQuestionWord(verb);
             
             data.allSubjects.forEach(subject => {
                 result[subject] = {
                     positive: `${subject} will ${verb}`,
                     negative: `${subject} won't ${verb}`,
                     question: `Will ${subject} ${verb}?`,
-                    whQuestion: `What will ${subject} ${verb}?`,
+                    whQuestion: `${whWord} will ${subject} ${verb}?`,
                     russian: getRussianFuture(verb, subject)
                 };
             });
@@ -1372,6 +1587,7 @@
 
         function generatePresentPerfect(verb, pastParticiple) {
             const result = {};
+            const whWord = utils.getWhQuestionWord(verb);
             
             data.allSubjects.forEach(subject => {
                 const aux = ['he', 'she', 'it'].includes(subject) ? 'has' : 'have';
@@ -1381,7 +1597,7 @@
                     positive: `${subject} ${aux} ${pastParticiple}`,
                     negative: `${subject} ${auxNeg} ${pastParticiple}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} ${pastParticiple}?`,
-                    whQuestion: `What ${aux} ${subject} ${pastParticiple}?`,
+                    whQuestion: `${whWord} ${aux} ${subject} ${pastParticiple}?`,
                     russian: getRussianPast(verb, subject)
                 };
             });
@@ -1391,13 +1607,14 @@
 
         function generatePastPerfect(verb, pastParticiple) {
             const result = {};
+            const whWord = utils.getWhQuestionWord(verb);
             
             data.allSubjects.forEach(subject => {
                 result[subject] = {
                     positive: `${subject} had ${pastParticiple}`,
                     negative: `${subject} hadn't ${pastParticiple}`,
                     question: `Had ${subject} ${pastParticiple}?`,
-                    whQuestion: `What had ${subject} ${pastParticiple}?`,
+                    whQuestion: `${whWord} had ${subject} ${pastParticiple}?`,
                     russian: getRussianPast(verb, subject).replace(/\./g, '') + ' (до того)'
                 };
             });
@@ -1407,6 +1624,7 @@
 
         function generatePresentContinuous(verb, ingForm) {
             const result = {};
+            const whWord = utils.getWhQuestionWord(verb);
             
             data.allSubjects.forEach(subject => {
                 const beForm = subject === 'I' ? 'am' : 
@@ -1416,11 +1634,14 @@
                 const beQuestion = subject === 'I' ? 'Am' : 
                                  ['he', 'she', 'it'].includes(subject) ? 'Is' : 'Are';
                 
+                // For continuous, we need the lowercase auxiliary for wh-questions
+                const whAux = beForm.toLowerCase();
+                
                 result[subject] = {
                     positive: `${subject} ${beForm} ${ingForm}`,
                     negative: `${subject} ${beNeg} ${ingForm}`,
                     question: `${beQuestion} ${subject} ${ingForm}?`,
-                    whQuestion: `What ${beForm} ${subject} ${ingForm}?`,
+                    whQuestion: `${whWord} ${whAux} ${subject} ${ingForm}?`,
                     russian: getRussianPresent(verb, subject) + ' (сейчас)'
                 };
             });
@@ -1430,6 +1651,7 @@
 
         function generatePastContinuous(verb, ingForm) {
             const result = {};
+            const whWord = utils.getWhQuestionWord(verb);
             
             data.allSubjects.forEach(subject => {
                 const wasWere = ['I', 'he', 'she', 'it'].includes(subject) ? 'was' : 'were';
@@ -1440,7 +1662,7 @@
                     positive: `${subject} ${wasWere} ${ingForm}`,
                     negative: `${subject} ${wasWereNeg} ${ingForm}`,
                     question: `${wasWereQuestion} ${subject} ${ingForm}?`,
-                    whQuestion: `What ${wasWere} ${subject} ${ingForm}?`,
+                    whQuestion: `${whWord} ${wasWere} ${subject} ${ingForm}?`,
                     russian: getRussianPast(verb, subject).replace(/\./g, '') + ' (в тот момент)'
                 };
             });
@@ -1450,13 +1672,14 @@
 
         function generateFutureContinuous(verb, ingForm) {
             const result = {};
+            const whWord = utils.getWhQuestionWord(verb);
             
             data.allSubjects.forEach(subject => {
                 result[subject] = {
                     positive: `${subject} will be ${ingForm}`,
                     negative: `${subject} won't be ${ingForm}`,
                     question: `Will ${subject} be ${ingForm}?`,
-                    whQuestion: `What will ${subject} be ${ingForm}?`,
+                    whQuestion: `${whWord} will ${subject} be ${ingForm}?`,
                     russian: getRussianFuture(verb, subject).replace(/\./g, '') + ' (в тот момент)'
                 };
             });
@@ -1466,6 +1689,7 @@
 
         function generatePresentPerfectContinuous(verb, ingForm) {
             const result = {};
+            const whWord = utils.getWhQuestionWord(verb, 'presentPerfectContinuous');
             
             data.allSubjects.forEach(subject => {
                 const aux = ['he', 'she', 'it'].includes(subject) ? 'has' : 'have';
@@ -1475,7 +1699,7 @@
                     positive: `${subject} ${aux} been ${ingForm}`,
                     negative: `${subject} ${auxNeg} been ${ingForm}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} been ${ingForm}?`,
-                    whQuestion: `How long ${aux} ${subject} been ${ingForm}?`,
+                    whQuestion: `${whWord} ${aux} ${subject} been ${ingForm}?`,
                     russian: getRussianPresent(verb, subject) + ' (уже какое-то время)'
                 };
             });
@@ -1485,13 +1709,14 @@
 
         function generatePastPerfectContinuous(verb, ingForm) {
             const result = {};
+            const whWord = utils.getWhQuestionWord(verb, 'pastPerfectContinuous');
             
             data.allSubjects.forEach(subject => {
                 result[subject] = {
                     positive: `${subject} had been ${ingForm}`,
                     negative: `${subject} hadn't been ${ingForm}`,
                     question: `Had ${subject} been ${ingForm}?`,
-                    whQuestion: `How long had ${subject} been ${ingForm}?`,
+                    whQuestion: `${whWord} had ${subject} been ${ingForm}?`,
                     russian: getRussianPast(verb, subject).replace(/\./g, '') + ' (до того момента)'
                 };
             });
