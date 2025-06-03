@@ -584,7 +584,7 @@
             <div class="verb-info" id="currentVerbInfo">Current verb: go</div>
             <button class="rules-button" onclick="app.showRules()">📚 Rules</button>
             
-            <div class="exercise-container">
+            <div class="exercise-container" onclick="app.toggleExamples()">
                 <div id="sentenceDisplay">
                     <div class="sentence" id="sentence1">Loading...</div>
                     <div class="sentence" id="sentence2">Loading...</div>
@@ -655,13 +655,6 @@
             init() {
                 // Show welcome screen by default
                 this.showScreen('welcomeScreen');
-                
-                // Add click handler for exercise container
-                document.getElementById('sentenceDisplay').addEventListener('click', (e) => {
-                    if (e.target.closest('#sentenceDisplay')) {
-                        this.toggleExamples();
-                    }
-                });
             },
             
             // Toggle examples visibility
@@ -671,10 +664,12 @@
                 
                 sentences.forEach(id => {
                     const element = document.getElementById(id);
-                    if (this.examplesHidden) {
-                        element.style.display = 'none';
-                    } else {
-                        element.style.display = 'block';
+                    if (element) {
+                        if (this.examplesHidden) {
+                            element.style.display = 'none';
+                        } else {
+                            element.style.display = 'block';
+                        }
                     }
                 });
             },
@@ -684,7 +679,10 @@
                 if (this.examplesHidden) {
                     const sentences = ['sentence2', 'sentence3', 'sentence4'];
                     sentences.forEach(id => {
-                        document.getElementById(id).style.display = 'none';
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.style.display = 'none';
+                        }
                     });
                 }
             },
@@ -1003,6 +1001,9 @@
                 'presentPerfectContinuous': { name: 'Present Perfect Continuous', class: 'present-perfect-continuous' },
                 'pastPerfectContinuous': { name: 'Past Perfect Continuous', class: 'past-perfect-continuous' }
             },
+            
+            // All subjects
+            allSubjects: ['I', 'you', 'he', 'she', 'it', 'we', 'they'],
             
             // Verbs that typically don't use continuous forms
             nonContinuousVerbs: ['know', 'understand', 'believe', 'remember', 'forget', 
@@ -1360,6 +1361,11 @@
             
             // Format wh-question with proper preposition placement
             formatWhQuestion(whWord, auxPattern, verb) {
+                // Handle undefined or null values
+                if (!whWord || !auxPattern || !verb) {
+                    return `What ${auxPattern} ${verb}?`;
+                }
+                
                 // Check if whWord contains "..." indicating split placement
                 if (whWord.includes('...')) {
                     const parts = whWord.split('...');
@@ -1437,7 +1443,7 @@
 
         // Initialize verb dictionary with basic verbs
         function initializeVerbDictionary() {
-            // Basic verb structures
+            // Basic verb structures  
             const basicVerbs = {
                 'be': {
                     present: {
@@ -1553,6 +1559,9 @@
                 }
             };
             
+            // Clear existing dictionary
+            data.verbDictionary = {};
+            
             // Copy basic verbs
             Object.assign(data.verbDictionary, basicVerbs);
             
@@ -1569,6 +1578,9 @@
 
         // Generate all tenses for a verb
         function generateVerbTenses(verb) {
+            // Skip if verb is not in infinitives dictionary
+            if (!data.verbInfinitives[verb]) return;
+            
             const subjects = data.allSubjects;
             const ingForm = utils.getIngForm(verb);
             const pastParticiple = utils.getPastParticiple(verb);
@@ -1589,7 +1601,11 @@
             
             Object.keys(tenseGenerators).forEach(tense => {
                 if (!data.verbDictionary[verb][tense]) {
-                    data.verbDictionary[verb][tense] = tenseGenerators[tense]();
+                    try {
+                        data.verbDictionary[verb][tense] = tenseGenerators[tense]();
+                    } catch (error) {
+                        console.error(`Error generating ${tense} for ${verb}:`, error);
+                    }
                 }
             });
         }
@@ -1616,11 +1632,13 @@
                 const aux = ['he', 'she', 'it'].includes(subject) ? 'does' : 'do';
                 const auxNeg = ['he', 'she', 'it'].includes(subject) ? "doesn't" : "don't";
                 
+                const whQuestion = utils.formatWhQuestion(whWord, `${aux} ${subject}`, verb);
+                
                 result[subject] = {
                     positive: `${subject} ${base}`,
                     negative: `${subject} ${auxNeg} ${verb}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} ${verb}?`,
-                    whQuestion: utils.formatWhQuestion(whWord, `${aux} ${subject}`, verb),
+                    whQuestion: whQuestion,
                     russian: getRussianPresent(verb, subject)
                 };
             });
