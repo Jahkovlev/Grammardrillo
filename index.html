@@ -147,6 +147,29 @@
             border-radius: 15px;
             padding: 25px;
             margin: 20px 0;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .exercise-container:hover {
+            background: #edf2f7;
+        }
+        
+        .exercise-container::after {
+            content: 'Click to hide/show examples';
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 12px;
+            color: #a0aec0;
+            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .exercise-container:hover::after {
+            opacity: 1;
         }
 
         .sentence {
@@ -619,6 +642,7 @@
             isLoading: false,
             audioEnabled: true,
             currentRulesLanguage: 'russian',
+            examplesHidden: false,  // Track if examples are hidden
             
             // Test state
             revealStage: 0,
@@ -631,6 +655,38 @@
             init() {
                 // Show welcome screen by default
                 this.showScreen('welcomeScreen');
+                
+                // Add click handler for exercise container
+                document.getElementById('sentenceDisplay').addEventListener('click', (e) => {
+                    if (e.target.closest('#sentenceDisplay')) {
+                        this.toggleExamples();
+                    }
+                });
+            },
+            
+            // Toggle examples visibility
+            toggleExamples() {
+                this.examplesHidden = !this.examplesHidden;
+                const sentences = ['sentence2', 'sentence3', 'sentence4'];
+                
+                sentences.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (this.examplesHidden) {
+                        element.style.display = 'none';
+                    } else {
+                        element.style.display = 'block';
+                    }
+                });
+            },
+            
+            // Apply hidden state
+            applyExamplesVisibility() {
+                if (this.examplesHidden) {
+                    const sentences = ['sentence2', 'sentence3', 'sentence4'];
+                    sentences.forEach(id => {
+                        document.getElementById(id).style.display = 'none';
+                    });
+                }
             },
             
             // Screen management
@@ -681,6 +737,13 @@
                 this.currentSubjectIndex = 0;
                 this.currentVerb = 'go';
                 
+                // Reset examples visibility to shown
+                this.examplesHidden = false;
+                const sentences = ['sentence2', 'sentence3', 'sentence4'];
+                sentences.forEach(id => {
+                    document.getElementById(id).style.display = 'block';
+                });
+                
                 // Update title and back button
                 const titles = {
                     'present': 'Present Simple',
@@ -729,6 +792,9 @@
                     `<br>(${data.verbForms[this.currentVerb]})` : '';
                 document.getElementById('currentVerbInfo').innerHTML = 
                     `Current verb: ${this.currentVerb} - ${russianInfinitive}${threeFormsDisplay}`;
+                
+                // Apply hidden state
+                this.applyExamplesVisibility();
             },
             
             nextSubject() {
@@ -938,8 +1004,10 @@
                 'pastPerfectContinuous': { name: 'Past Perfect Continuous', class: 'past-perfect-continuous' }
             },
             
-            // All subjects
-            allSubjects: ['I', 'you', 'he', 'she', 'it', 'we', 'they'],
+            // Verbs that typically don't use continuous forms
+            nonContinuousVerbs: ['know', 'understand', 'believe', 'remember', 'forget', 
+                                'like', 'love', 'hate', 'want', 'need', 'prefer',
+                                'belong', 'own', 'possess', 'cost', 'seem', 'appear'],
             
             // Russian infinitive forms
             verbInfinitives: {
@@ -1221,7 +1289,7 @@
                     'say': 'What',
                     'tell': 'What',
                     'speak': 'What language',
-                    'talk': 'What about',
+                    'talk': 'What...about',
                     
                     // Perception verbs
                     'see': 'What',
@@ -1231,7 +1299,7 @@
                     'taste': 'What',
                     
                     // Time-based verbs
-                    'wait': 'Who for',
+                    'wait': 'Who...for',
                     'sleep': 'Where',
                     'wake': 'What time',
                     'start': 'What',
@@ -1240,7 +1308,7 @@
                     'end': 'What',
                     
                     // Cognitive verbs
-                    'think': 'What about',
+                    'think': 'What...about',
                     'know': 'What',
                     'understand': 'What',
                     'learn': 'What',
@@ -1279,7 +1347,7 @@
                     'sing': 'What',
                     'cry': 'Why',
                     'beat': 'Who',
-                    'dream': 'What about'
+                    'dream': 'What...about'
                 };
                 
                 // For continuous tenses with duration focus
@@ -1288,6 +1356,20 @@
                 }
                 
                 return whQuestions[verb] || 'What';
+            },
+            
+            // Format wh-question with proper preposition placement
+            formatWhQuestion(whWord, auxPattern, verb) {
+                // Check if whWord contains "..." indicating split placement
+                if (whWord.includes('...')) {
+                    const parts = whWord.split('...');
+                    const whPart = parts[0];
+                    const prepPart = parts[1];
+                    return `${whPart} ${auxPattern} ${verb} ${prepPart}?`;
+                }
+                
+                // Normal wh-question
+                return `${whWord} ${auxPattern} ${verb}?`;
             },
             
             // Get past participle
@@ -1538,7 +1620,7 @@
                     positive: `${subject} ${base}`,
                     negative: `${subject} ${auxNeg} ${verb}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} ${verb}?`,
-                    whQuestion: `${whWord} ${aux} ${subject} ${verb}?`,
+                    whQuestion: utils.formatWhQuestion(whWord, `${aux} ${subject}`, verb),
                     russian: getRussianPresent(verb, subject)
                 };
             });
@@ -1560,7 +1642,7 @@
                     positive: `${subject} ${pastForm}`,
                     negative: `${subject} didn't ${verb}`,
                     question: `Did ${subject} ${verb}?`,
-                    whQuestion: `${whWord} did ${subject} ${verb}?`,
+                    whQuestion: utils.formatWhQuestion(whWord, `did ${subject}`, verb),
                     russian: getRussianPast(verb, subject)
                 };
             });
@@ -1577,7 +1659,7 @@
                     positive: `${subject} will ${verb}`,
                     negative: `${subject} won't ${verb}`,
                     question: `Will ${subject} ${verb}?`,
-                    whQuestion: `${whWord} will ${subject} ${verb}?`,
+                    whQuestion: utils.formatWhQuestion(whWord, `will ${subject}`, verb),
                     russian: getRussianFuture(verb, subject)
                 };
             });
@@ -1597,7 +1679,7 @@
                     positive: `${subject} ${aux} ${pastParticiple}`,
                     negative: `${subject} ${auxNeg} ${pastParticiple}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} ${pastParticiple}?`,
-                    whQuestion: `${whWord} ${aux} ${subject} ${pastParticiple}?`,
+                    whQuestion: utils.formatWhQuestion(whWord, `${aux} ${subject}`, pastParticiple),
                     russian: getRussianPast(verb, subject)
                 };
             });
@@ -1614,7 +1696,7 @@
                     positive: `${subject} had ${pastParticiple}`,
                     negative: `${subject} hadn't ${pastParticiple}`,
                     question: `Had ${subject} ${pastParticiple}?`,
-                    whQuestion: `${whWord} had ${subject} ${pastParticiple}?`,
+                    whQuestion: utils.formatWhQuestion(whWord, `had ${subject}`, pastParticiple),
                     russian: getRussianPast(verb, subject).replace(/\./g, '') + ' (до того)'
                 };
             });
@@ -1641,7 +1723,7 @@
                     positive: `${subject} ${beForm} ${ingForm}`,
                     negative: `${subject} ${beNeg} ${ingForm}`,
                     question: `${beQuestion} ${subject} ${ingForm}?`,
-                    whQuestion: `${whWord} ${whAux} ${subject} ${ingForm}?`,
+                    whQuestion: utils.formatWhQuestion(whWord, `${whAux} ${subject}`, ingForm),
                     russian: getRussianPresent(verb, subject) + ' (сейчас)'
                 };
             });
@@ -1662,7 +1744,7 @@
                     positive: `${subject} ${wasWere} ${ingForm}`,
                     negative: `${subject} ${wasWereNeg} ${ingForm}`,
                     question: `${wasWereQuestion} ${subject} ${ingForm}?`,
-                    whQuestion: `${whWord} ${wasWere} ${subject} ${ingForm}?`,
+                    whQuestion: utils.formatWhQuestion(whWord, `${wasWere} ${subject}`, ingForm),
                     russian: getRussianPast(verb, subject).replace(/\./g, '') + ' (в тот момент)'
                 };
             });
@@ -1679,7 +1761,7 @@
                     positive: `${subject} will be ${ingForm}`,
                     negative: `${subject} won't be ${ingForm}`,
                     question: `Will ${subject} be ${ingForm}?`,
-                    whQuestion: `${whWord} will ${subject} be ${ingForm}?`,
+                    whQuestion: utils.formatWhQuestion(whWord, `will ${subject} be`, ingForm),
                     russian: getRussianFuture(verb, subject).replace(/\./g, '') + ' (в тот момент)'
                 };
             });
@@ -1699,7 +1781,7 @@
                     positive: `${subject} ${aux} been ${ingForm}`,
                     negative: `${subject} ${auxNeg} been ${ingForm}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} been ${ingForm}?`,
-                    whQuestion: `${whWord} ${aux} ${subject} been ${ingForm}?`,
+                    whQuestion: utils.formatWhQuestion(whWord, `${aux} ${subject} been`, ingForm),
                     russian: getRussianPresent(verb, subject) + ' (уже какое-то время)'
                 };
             });
@@ -1716,7 +1798,7 @@
                     positive: `${subject} had been ${ingForm}`,
                     negative: `${subject} hadn't been ${ingForm}`,
                     question: `Had ${subject} been ${ingForm}?`,
-                    whQuestion: `${whWord} had ${subject} been ${ingForm}?`,
+                    whQuestion: utils.formatWhQuestion(whWord, `had ${subject} been`, ingForm),
                     russian: getRussianPast(verb, subject).replace(/\./g, '') + ' (до того момента)'
                 };
             });
