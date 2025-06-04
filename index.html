@@ -2489,13 +2489,13 @@
                 case 'pastPerfect':
                     return getRussianPast(verb, subject, true) + ' (до момента в прошлом)'; // Use perfective
                 case 'presentContinuous':
-                    return getRussianPresent(verb, subject) + ' (сейчас)';
+                    return getRussianPresent(verb, subject, false) + ' (сейчас)';
                 case 'pastContinuous':
                     return getRussianPast(verb, subject, false) + ' (какое-то время в прошлом)'; // Use imperfective
                 case 'futureContinuous':
                     return getRussianFuture(verb, subject) + ' (какое-то время в будущем)';
                 case 'presentPerfectContinuous':
-                    return getRussianPresent(verb, subject) + ' (уже какое-то время)';
+                    return getRussianPresent(verb, subject, false) + ' (уже какое-то время)';
                 case 'pastPerfectContinuous':
                     return getRussianPast(verb, subject, false) + ' (какое-то время до момента в прошлом)'; // Use imperfective
                 default:
