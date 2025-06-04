@@ -1682,7 +1682,7 @@
                     negative: `${subject} ${auxNeg} ${verb}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} ${verb}?`,
                     whQuestion: whQuestion,
-                    russian: getRussianPresent(verb, subject)
+                    russian: getRussianTranslation(verb, subject, 'present')
                 };
             });
             
@@ -1704,7 +1704,7 @@
                     negative: `${subject} didn't ${verb}`,
                     question: `Did ${subject} ${verb}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `did ${subject}`, verb),
-                    russian: getRussianPast(verb, subject)
+                    russian: getRussianTranslation(verb, subject, 'past')
                 };
             });
             
@@ -1721,7 +1721,7 @@
                     negative: `${subject} won't ${verb}`,
                     question: `Will ${subject} ${verb}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `will ${subject}`, verb),
-                    russian: getRussianFuture(verb, subject)
+                    russian: getRussianTranslation(verb, subject, 'future')
                 };
             });
             
@@ -1741,7 +1741,7 @@
                     negative: `${subject} ${auxNeg} ${pastParticiple}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} ${pastParticiple}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `${aux} ${subject}`, pastParticiple),
-                    russian: getRussianPast(verb, subject)
+                    russian: getRussianTranslation(verb, subject, 'presentPerfect')
                 };
             });
             
@@ -1758,7 +1758,7 @@
                     negative: `${subject} hadn't ${pastParticiple}`,
                     question: `Had ${subject} ${pastParticiple}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `had ${subject}`, pastParticiple),
-                    russian: getRussianPast(verb, subject) + ' (до того)'
+                    russian: getRussianTranslation(verb, subject, 'pastPerfect')
                 };
             });
             
@@ -1777,7 +1777,6 @@
                 const beQuestion = subject === 'I' ? 'Am' : 
                                  ['he', 'she', 'it'].includes(subject) ? 'Is' : 'Are';
                 
-                // For continuous, we need the lowercase auxiliary for wh-questions
                 const whAux = beForm.toLowerCase();
                 
                 result[subject] = {
@@ -1785,7 +1784,7 @@
                     negative: `${subject} ${beNeg} ${ingForm}`,
                     question: `${beQuestion} ${subject} ${ingForm}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `${whAux} ${subject}`, ingForm),
-                    russian: getRussianContinuous(verb, subject, 'presentContinuous')
+                    russian: getRussianTranslation(verb, subject, 'presentContinuous')
                 };
             });
             
@@ -1806,7 +1805,7 @@
                     negative: `${subject} ${wasWereNeg} ${ingForm}`,
                     question: `${wasWereQuestion} ${subject} ${ingForm}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `${wasWere} ${subject}`, ingForm),
-                    russian: getRussianContinuous(verb, subject, 'pastContinuous')
+                    russian: getRussianTranslation(verb, subject, 'pastContinuous')
                 };
             });
             
@@ -1823,7 +1822,7 @@
                     negative: `${subject} won't be ${ingForm}`,
                     question: `Will ${subject} be ${ingForm}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `will ${subject} be`, ingForm),
-                    russian: getRussianContinuous(verb, subject, 'futureContinuous')
+                    russian: getRussianTranslation(verb, subject, 'futureContinuous')
                 };
             });
             
@@ -1843,7 +1842,7 @@
                     negative: `${subject} ${auxNeg} been ${ingForm}`,
                     question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} been ${ingForm}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `${aux} ${subject} been`, ingForm),
-                    russian: getRussianContinuous(verb, subject, 'presentPerfectContinuous')
+                    russian: getRussianTranslation(verb, subject, 'presentPerfectContinuous')
                 };
             });
             
@@ -1860,7 +1859,7 @@
                     negative: `${subject} hadn't been ${ingForm}`,
                     question: `Had ${subject} been ${ingForm}?`,
                     whQuestion: utils.formatWhQuestion(whWord, `had ${subject} been`, ingForm),
-                    russian: getRussianContinuous(verb, subject, 'pastPerfectContinuous')
+                    russian: getRussianTranslation(verb, subject, 'pastPerfectContinuous')
                 };
             });
             
@@ -2197,23 +2196,153 @@
             return `${pronouns[subject]} ${futureHelper[subject]} ${data.verbInfinitives[verb] || verb}`;
         }
         
-        function getRussianContinuous(verb, subject, tense) {
-            const base = getRussianPresent(verb, subject);
-            const modifiers = {
-                'presentContinuous': ' (сейчас)',
-                'pastContinuous': ' (в тот момент)',
-                'futureContinuous': ' (в тот момент)',
-                'presentPerfectContinuous': ' (уже какое-то время)',
-                'pastPerfectContinuous': ' (до того момента)'
-            };
-            
-            if (tense === 'pastContinuous' || tense === 'pastPerfectContinuous') {
-                return getRussianPast(verb, subject) + (modifiers[tense] || '');
-            } else if (tense === 'futureContinuous') {
-                return getRussianFuture(verb, subject) + (modifiers[tense] || '');
+        // Complete Russian translations for key verbs
+        const completeRussianTranslations = {
+            'go': {
+                'present': {
+                    'I': 'Я хожу', 'you': 'Ты ходишь', 'he': 'Он ходит',
+                    'she': 'Она ходит', 'it': 'Оно ходит', 'we': 'Мы ходим', 'they': 'Они ходят'
+                },
+                'past': {
+                    'I': 'Я ходил/ходила', 'you': 'Ты ходил/ходила', 'he': 'Он ходил',
+                    'she': 'Она ходила', 'it': 'Оно ходило', 'we': 'Мы ходили', 'they': 'Они ходили'
+                },
+                'future': {
+                    'I': 'Я пойду', 'you': 'Ты пойдёшь', 'he': 'Он пойдёт',
+                    'she': 'Она пойдёт', 'it': 'Оно пойдёт', 'we': 'Мы пойдём', 'they': 'Они пойдут'
+                },
+                'presentPerfect': {
+                    'I': 'Я сходил/сходила', 'you': 'Ты сходил/сходила', 'he': 'Он сходил',
+                    'she': 'Она сходила', 'it': 'Оно сходило', 'we': 'Мы сходили', 'they': 'Они сходили'
+                },
+                'pastPerfect': {
+                    'I': 'Я сходил/сходила (до момента в прошлом)', 'you': 'Ты сходил/сходила (до момента в прошлом)', 
+                    'he': 'Он сходил (до момента в прошлом)', 'she': 'Она сходила (до момента в прошлом)',
+                    'it': 'Оно сходило (до момента в прошлом)', 'we': 'Мы сходили (до момента в прошлом)', 
+                    'they': 'Они сходили (до момента в прошлом)'
+                },
+                'presentContinuous': {
+                    'I': 'Я иду (сейчас)', 'you': 'Ты идёшь (сейчас)', 'he': 'Он идёт (сейчас)',
+                    'she': 'Она идёт (сейчас)', 'it': 'Оно идёт (сейчас)', 'we': 'Мы идём (сейчас)', 'they': 'Они идут (сейчас)'
+                },
+                'pastContinuous': {
+                    'I': 'Я шёл/шла (какое-то время в прошлом)', 'you': 'Ты шёл/шла (какое-то время в прошлом)',
+                    'he': 'Он шёл (какое-то время в прошлом)', 'she': 'Она шла (какое-то время в прошлом)',
+                    'it': 'Оно шло (какое-то время в прошлом)', 'we': 'Мы шли (какое-то время в прошлом)',
+                    'they': 'Они шли (какое-то время в прошлом)'
+                },
+                'futureContinuous': {
+                    'I': 'Я буду идти (какое-то время в будущем)', 'you': 'Ты будешь идти (какое-то время в будущем)',
+                    'he': 'Он будет идти (какое-то время в будущем)', 'she': 'Она будет идти (какое-то время в будущем)',
+                    'it': 'Оно будет идти (какое-то время в будущем)', 'we': 'Мы будем идти (какое-то время в будущем)',
+                    'they': 'Они будут идти (какое-то время в будущем)'
+                },
+                'presentPerfectContinuous': {
+                    'I': 'Я хожу (уже какое-то время)', 'you': 'Ты ходишь (уже какое-то время)',
+                    'he': 'Он ходит (уже какое-то время)', 'she': 'Она ходит (уже какое-то время)',
+                    'it': 'Оно ходит (уже какое-то время)', 'we': 'Мы ходим (уже какое-то время)',
+                    'they': 'Они ходят (уже какое-то время)'
+                },
+                'pastPerfectContinuous': {
+                    'I': 'Я ходил/ходила (какое-то время до момента в прошлом)', 
+                    'you': 'Ты ходил/ходила (какое-то время до момента в прошлом)',
+                    'he': 'Он ходил (какое-то время до момента в прошлом)', 
+                    'she': 'Она ходила (какое-то время до момента в прошлом)',
+                    'it': 'Оно ходило (какое-то время до момента в прошлом)', 
+                    'we': 'Мы ходили (какое-то время до момента в прошлом)',
+                    'they': 'Они ходили (какое-то время до момента в прошлом)'
+                }
+            },
+            'come': {
+                'present': {
+                    'I': 'Я прихожу', 'you': 'Ты приходишь', 'he': 'Он приходит',
+                    'she': 'Она приходит', 'it': 'Оно приходит', 'we': 'Мы приходим', 'they': 'Они приходят'
+                },
+                'past': {
+                    'I': 'Я приходил/приходила', 'you': 'Ты приходил/приходила', 'he': 'Он приходил',
+                    'she': 'Она приходила', 'it': 'Оно приходило', 'we': 'Мы приходили', 'they': 'Они приходили'
+                },
+                'future': {
+                    'I': 'Я приду', 'you': 'Ты придёшь', 'he': 'Он придёт',
+                    'she': 'Она придёт', 'it': 'Оно придёт', 'we': 'Мы придём', 'they': 'Они придут'
+                },
+                'presentPerfect': {
+                    'I': 'Я пришёл/пришла', 'you': 'Ты пришёл/пришла', 'he': 'Он пришёл',
+                    'she': 'Она пришла', 'it': 'Оно пришло', 'we': 'Мы пришли', 'they': 'Они пришли'
+                },
+                'pastPerfect': {
+                    'I': 'Я пришёл/пришла (до момента в прошлом)', 'you': 'Ты пришёл/пришла (до момента в прошлом)',
+                    'he': 'Он пришёл (до момента в прошлом)', 'she': 'Она пришла (до момента в прошлом)',
+                    'it': 'Оно пришло (до момента в прошлом)', 'we': 'Мы пришли (до момента в прошлом)',
+                    'they': 'Они пришли (до момента в прошлом)'
+                },
+                'presentContinuous': {
+                    'I': 'Я иду (сейчас)', 'you': 'Ты идёшь (сейчас)', 'he': 'Он идёт (сейчас)',
+                    'she': 'Она идёт (сейчас)', 'it': 'Оно идёт (сейчас)', 'we': 'Мы идём (сейчас)', 'they': 'Они идут (сейчас)'
+                },
+                'pastContinuous': {
+                    'I': 'Я шёл/шла (какое-то время в прошлом)', 'you': 'Ты шёл/шла (какое-то время в прошлом)',
+                    'he': 'Он шёл (какое-то время в прошлом)', 'she': 'Она шла (какое-то время в прошлом)',
+                    'it': 'Оно шло (какое-то время в прошлом)', 'we': 'Мы шли (какое-то время в прошлом)',
+                    'they': 'Они шли (какое-то время в прошлом)'
+                },
+                'futureContinuous': {
+                    'I': 'Я буду приходить (какое-то время в будущем)', 'you': 'Ты будешь приходить (какое-то время в будущем)',
+                    'he': 'Он будет приходить (какое-то время в будущем)', 'she': 'Она будет приходить (какое-то время в будущем)',
+                    'it': 'Оно будет приходить (какое-то время в будущем)', 'we': 'Мы будем приходить (какое-то время в будущем)',
+                    'they': 'Они будут приходить (какое-то время в будущем)'
+                },
+                'presentPerfectContinuous': {
+                    'I': 'Я прихожу (уже какое-то время)', 'you': 'Ты приходишь (уже какое-то время)',
+                    'he': 'Он приходит (уже какое-то время)', 'she': 'Она приходит (уже какое-то время)',
+                    'it': 'Оно приходит (уже какое-то время)', 'we': 'Мы приходим (уже какое-то время)',
+                    'they': 'Они приходят (уже какое-то время)'
+                },
+                'pastPerfectContinuous': {
+                    'I': 'Я приходил/приходила (какое-то время до момента в прошлом)',
+                    'you': 'Ты приходил/приходила (какое-то время до момента в прошлом)',
+                    'he': 'Он приходил (какое-то время до момента в прошлом)',
+                    'she': 'Она приходила (какое-то время до момента в прошлом)',
+                    'it': 'Оно приходило (какое-то время до момента в прошлом)',
+                    'we': 'Мы приходили (какое-то время до момента в прошлом)',
+                    'they': 'Они приходили (какое-то время до момента в прошлом)'
+                }
+            }
+        };
+        
+        function getRussianTranslation(verb, subject, tense) {
+            // First check if we have a complete translation
+            if (completeRussianTranslations[verb] && 
+                completeRussianTranslations[verb][tense] && 
+                completeRussianTranslations[verb][tense][subject]) {
+                return completeRussianTranslations[verb][tense][subject];
             }
             
-            return base + (modifiers[tense] || '');
+            // Otherwise, use improved generation based on tense
+            switch(tense) {
+                case 'present':
+                    return getRussianPresent(verb, subject);
+                case 'past':
+                    return getRussianPast(verb, subject);
+                case 'future':
+                    return getRussianFuture(verb, subject);
+                case 'presentPerfect':
+                    return getRussianPast(verb, subject);
+                case 'pastPerfect':
+                    return getRussianPast(verb, subject) + ' (до момента в прошлом)';
+                case 'presentContinuous':
+                    return getRussianPresent(verb, subject) + ' (сейчас)';
+                case 'pastContinuous':
+                    return getRussianPast(verb, subject) + ' (какое-то время в прошлом)';
+                case 'futureContinuous':
+                    return getRussianFuture(verb, subject) + ' (какое-то время в будущем)';
+                case 'presentPerfectContinuous':
+                    return getRussianPresent(verb, subject) + ' (уже какое-то время)';
+                case 'pastPerfectContinuous':
+                    return getRussianPast(verb, subject) + ' (какое-то время до момента в прошлом)';
+                default:
+                    return getRussianPresent(verb, subject);
+            }
         }
 
         // Initialize app
