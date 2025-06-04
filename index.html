@@ -733,7 +733,14 @@
             startExercise(tense) {
                 this.currentTense = tense;
                 this.currentSubjectIndex = 0;
-                this.currentVerb = 'go';
+                
+                // Don't start with "be" in perfect continuous tenses
+                if ((tense === 'presentPerfectContinuous' || tense === 'pastPerfectContinuous')) {
+                    const availableVerbs = Object.keys(data.verbDictionary).filter(v => v !== 'be');
+                    this.currentVerb = availableVerbs[0] || 'go';
+                } else {
+                    this.currentVerb = 'go';
+                }
                 
                 // Reset examples visibility to shown
                 this.examplesHidden = false;
@@ -776,6 +783,17 @@
                 
                 const subject = data.allSubjects[this.currentSubjectIndex];
                 const verbData = data.verbDictionary[this.currentVerb]?.[this.currentTense]?.[subject];
+                
+                // If no verb data (e.g., "be" in perfect continuous), switch to a different verb
+                if (!verbData) {
+                    if (this.currentVerb === 'be' && 
+                        (this.currentTense === 'presentPerfectContinuous' || 
+                         this.currentTense === 'pastPerfectContinuous')) {
+                        this.currentVerb = 'go';
+                        this.updateExerciseDisplay();
+                        return;
+                    }
+                }
                 
                 if (verbData) {
                     document.getElementById('sentence1').textContent = verbData.positive;
@@ -820,8 +838,23 @@
                 
                 const verbs = Object.keys(data.verbDictionary);
                 let newVerb;
+                let attempts = 0;
+                
                 do {
                     newVerb = verbs[Math.floor(Math.random() * verbs.length)];
+                    attempts++;
+                    
+                    // Skip "be" verb in perfect continuous tenses
+                    if (newVerb === 'be' && 
+                        (this.currentTense === 'presentPerfectContinuous' || 
+                         this.currentTense === 'pastPerfectContinuous')) {
+                        continue;
+                    }
+                    
+                    // If we've tried too many times, just use a different verb
+                    if (attempts > 10 && newVerb === 'be') {
+                        newVerb = 'go';
+                    }
                 } while (newVerb === this.currentVerb);
                 
                 this.currentVerb = newVerb;
@@ -928,13 +961,25 @@
                     el.style.display = 'none';
                 });
                 
-                const randomSubject = data.allSubjects[Math.floor(Math.random() * data.allSubjects.length)];
-                const verbs = Object.keys(data.verbDictionary);
-                const randomVerb = verbs[Math.floor(Math.random() * verbs.length)];
-                const tenses = Object.keys(data.tenseConfig);
-                const randomTense = tenses[Math.floor(Math.random() * tenses.length)];
+                let verbData = null;
+                let randomSubject, randomVerb, randomTense;
                 
-                const verbData = data.verbDictionary[randomVerb]?.[randomTense]?.[randomSubject];
+                // Keep trying until we get a valid combination
+                while (!verbData) {
+                    randomSubject = data.allSubjects[Math.floor(Math.random() * data.allSubjects.length)];
+                    const verbs = Object.keys(data.verbDictionary);
+                    randomVerb = verbs[Math.floor(Math.random() * verbs.length)];
+                    const tenses = Object.keys(data.tenseConfig);
+                    randomTense = tenses[Math.floor(Math.random() * tenses.length)];
+                    
+                    // Skip "be" verb in perfect continuous tenses
+                    if (randomVerb === 'be' && 
+                        (randomTense === 'presentPerfectContinuous' || randomTense === 'pastPerfectContinuous')) {
+                        continue;
+                    }
+                    
+                    verbData = data.verbDictionary[randomVerb]?.[randomTense]?.[randomSubject];
+                }
                 
                 if (verbData) {
                     const russianEl = document.getElementById('russianSentence');
@@ -1638,14 +1683,17 @@
                 presentContinuous: () => generatePresentContinuous(verb, ingForm),
                 pastContinuous: () => generatePastContinuous(verb, ingForm),
                 futureContinuous: () => generateFutureContinuous(verb, ingForm),
-                presentPerfectContinuous: () => generatePresentPerfectContinuous(verb, ingForm),
-                pastPerfectContinuous: () => generatePastPerfectContinuous(verb, ingForm)
+                presentPerfectContinuous: () => verb === 'be' ? null : generatePresentPerfectContinuous(verb, ingForm),
+                pastPerfectContinuous: () => verb === 'be' ? null : generatePastPerfectContinuous(verb, ingForm)
             };
             
             Object.keys(tenseGenerators).forEach(tense => {
                 if (!data.verbDictionary[verb][tense]) {
                     try {
-                        data.verbDictionary[verb][tense] = tenseGenerators[tense]();
+                        const result = tenseGenerators[tense]();
+                        if (result !== null) {
+                            data.verbDictionary[verb][tense] = result;
+                        }
                     } catch (error) {
                         console.error(`Error generating ${tense} for ${verb}:`, error);
                     }
@@ -2152,7 +2200,7 @@
             return `${pronouns[subject]} ${data.verbInfinitives[verb] || verb}`;
         }
 
-        function getRussianPast(verb, subject) {
+        function getRussianPast(verb, subject, usePerfective = false) {
             const pronouns = {
                 'I': 'Я', 'you': 'ты', 'he': 'он', 'she': 'она',
                 'it': 'оно', 'we': 'мы', 'they': 'они'
@@ -2160,7 +2208,8 @@
             
             // Use the past forms dictionary
             if (data.russianPastForms[verb]) {
-                const forms = data.russianPastForms[verb];
+                const verbData = data.russianPastForms[verb];
+                const forms = usePerfective && verbData.perfective ? verbData.perfective : verbData;
                 let form = '';
                 
                 if (subject === 'I' || subject === 'you') {
@@ -2311,6 +2360,11 @@
         };
         
         function getRussianTranslation(verb, subject, tense) {
+            // Skip "been being" constructions for "be" verb in perfect continuous tenses
+            if (verb === 'be' && (tense === 'presentPerfectContinuous' || tense === 'pastPerfectContinuous')) {
+                return null; // This will be handled by the generator to skip these forms
+            }
+            
             // First check if we have a complete translation
             if (completeRussianTranslations[verb] && 
                 completeRussianTranslations[verb][tense] && 
@@ -2323,23 +2377,23 @@
                 case 'present':
                     return getRussianPresent(verb, subject);
                 case 'past':
-                    return getRussianPast(verb, subject);
+                    return getRussianPast(verb, subject, false); // Use imperfective for simple past
                 case 'future':
                     return getRussianFuture(verb, subject);
                 case 'presentPerfect':
-                    return getRussianPast(verb, subject);
+                    return getRussianPast(verb, subject, true); // Use perfective for present perfect
                 case 'pastPerfect':
-                    return getRussianPast(verb, subject) + ' (до момента в прошлом)';
+                    return getRussianPast(verb, subject, true) + ' (до момента в прошлом)'; // Use perfective
                 case 'presentContinuous':
                     return getRussianPresent(verb, subject) + ' (сейчас)';
                 case 'pastContinuous':
-                    return getRussianPast(verb, subject) + ' (какое-то время в прошлом)';
+                    return getRussianPast(verb, subject, false) + ' (какое-то время в прошлом)'; // Use imperfective
                 case 'futureContinuous':
                     return getRussianFuture(verb, subject) + ' (какое-то время в будущем)';
                 case 'presentPerfectContinuous':
                     return getRussianPresent(verb, subject) + ' (уже какое-то время)';
                 case 'pastPerfectContinuous':
-                    return getRussianPast(verb, subject) + ' (какое-то время до момента в прошлом)';
+                    return getRussianPast(verb, subject, false) + ' (какое-то время до момента в прошлом)'; // Use imperfective
                 default:
                     return getRussianPresent(verb, subject);
             }
