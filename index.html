@@ -74,6 +74,13 @@
             transform: translateY(0);
         }
 
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         .menu-button {
             display: block;
             width: 100%;
@@ -83,6 +90,17 @@
 
         .menu-button:hover {
             background: #38a169;
+        }
+        
+        .category-button {
+            display: block;
+            width: 100%;
+            margin-bottom: 15px;
+            background: #4299e1;
+        }
+        
+        .category-button:hover {
+            background: #3182ce;
         }
 
         .back-button {
@@ -95,10 +113,251 @@
             background: #e53e3e;
         }
 
+        .navigation-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        .navigation-buttons .back-button {
+            margin-top: 10px;
+        }
+
+        .nav-button {
+            background: #4299e1;
+            padding: 10px 25px;
+            font-size: 16px;
+        }
+
+        .nav-button:hover {
+            background: #3182ce;
+        }
+
+        .exercise-container {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .exercise-container:hover {
+            background: #edf2f7;
+        }
+        
+        .exercise-container::after {
+            content: 'Click to hide/show examples';
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 12px;
+            color: #a0aec0;
+            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .exercise-container:hover::after {
+            opacity: 1;
+        }
+
+        .sentence {
+            font-size: 20px;
+            color: #2d3748;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .sentence:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .exercise-title {
+            font-size: 18px;
+            color: #718096;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
         .hidden {
             display: none;
         }
 
+        .verb-info {
+            background: #bee3f8;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #2c5282;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .rules-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .rules-button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f56565;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #e53e3e;
+            transform: scale(1.1);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+            cursor: pointer;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            user-select: none;
+            position: relative;
+        }
+
+        .modal-description:hover {
+            background: #e2e8f0;
+        }
+
+        .modal-description:after {
+            content: '🔄 Click to switch language';
+            position: absolute;
+            bottom: -20px;
+            right: 0;
+            font-size: 12px;
+            color: #718096;
+            font-style: italic;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fed7d7;
+            border-radius: 8px;
+        }
+
+        .nav-button.next-button {
+            background: #48bb78;
+        }
+        
+        .nav-button.next-button:hover {
+            background: #38a169;
+        }
+        
         .russian {
             font-size: 28px;
             color: #5a67d8;
@@ -111,7 +370,7 @@
             display: block !important;
             position: relative;
         }
-
+        
         .tense-badge {
             position: absolute;
             top: -10px;
@@ -125,8 +384,61 @@
             box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
             text-transform: uppercase;
             letter-spacing: 1px;
+            transition: all 0.3s ease;
+            animation: badgeAppear 0.5s ease-out;
+            cursor: default;
+            user-select: none;
         }
-
+        
+        @keyframes badgeAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(-10px);
+            }
+            50% {
+                transform: scale(1.1) translateY(0);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .tense-badge:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+        }
+        
+        .tense-badge.present { background: #48bb78; }
+        .tense-badge.present:hover { box-shadow: 0 4px 15px rgba(72, 187, 120, 0.5); }
+        
+        .tense-badge.past { background: #f56565; }
+        .tense-badge.past:hover { box-shadow: 0 4px 15px rgba(245, 101, 101, 0.5); }
+        
+        .tense-badge.future { background: #4299e1; }
+        .tense-badge.future:hover { box-shadow: 0 4px 15px rgba(66, 153, 225, 0.5); }
+        
+        .tense-badge.present-perfect { background: #9f7aea; }
+        .tense-badge.present-perfect:hover { box-shadow: 0 4px 15px rgba(159, 122, 234, 0.5); }
+        
+        .tense-badge.past-perfect { background: #ed8936; }
+        .tense-badge.past-perfect:hover { box-shadow: 0 4px 15px rgba(237, 137, 54, 0.5); }
+        
+        .tense-badge.present-continuous { background: #38b2ac; }
+        .tense-badge.present-continuous:hover { box-shadow: 0 4px 15px rgba(56, 178, 172, 0.5); }
+        
+        .tense-badge.past-continuous { background: #e53e3e; }
+        .tense-badge.past-continuous:hover { box-shadow: 0 4px 15px rgba(229, 62, 62, 0.5); }
+        
+        .tense-badge.future-continuous { background: #3182ce; }
+        .tense-badge.future-continuous:hover { box-shadow: 0 4px 15px rgba(49, 130, 206, 0.5); }
+        
+        .tense-badge.present-perfect-continuous { background: #805ad5; }
+        .tense-badge.present-perfect-continuous:hover { box-shadow: 0 4px 15px rgba(128, 90, 213, 0.5); }
+        
+        .tense-badge.past-perfect-continuous { background: #dd6b20; }
+        .tense-badge.past-perfect-continuous:hover { box-shadow: 0 4px 15px rgba(221, 107, 32, 0.5); }
+        
         .english {
             font-size: 22px;
             color: #2d3748;
@@ -134,25 +446,86 @@
             padding: 15px;
             background: #f7fafc;
             border-radius: 8px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
         }
-
-        .exercise-container {
-            background: #f7fafc;
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .test-item {
             cursor: pointer;
+            user-select: none;
+            width: 100%;
+        }
+        
+        #testContainer {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
         }
-
-        .nav-button {
-            background: #4299e1;
-            padding: 10px 25px;
-            font-size: 16px;
+        
+        #testContainer:after {
+            content: 'Tap to reveal answer';
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: #a0aec0;
+            font-style: italic;
         }
-
-        .nav-button:hover {
-            background: #3182ce;
+        
+        #testContainer.complete:after {
+            content: 'Complete! Try a new example';
+        }
+        
+        .exercise-screen {
+            /* Common styling for all exercise screens */
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            button {
+                padding: 12px 25px;
+                font-size: 16px;
+            }
+            
+            .navigation-buttons {
+                justify-content: center;
+            }
+            
+            .nav-button {
+                margin: 5px;
+            }
+            
+            .tense-badge {
+                animation: badgeAppear 0.5s ease-out, pulseMobile 2s ease-in-out infinite;
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+            
+            .russian {
+                font-size: 24px;
+                padding: 35px 15px 15px 15px;
+            }
+        }
+        
+        @keyframes pulseMobile {
+            0%, 100% {
+                box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                box-shadow: 0 2px 20px rgba(102, 126, 234, 0.6);
+            }
         }
     </style>
 </head>
@@ -161,198 +534,1021 @@
         <!-- Welcome Screen -->
         <div id="welcomeScreen" class="screen">
             <h1>Welcome to Grammardrillo!</h1>
-            <p class="welcome-text">Let's improve your English grammar!</p>
-            <button onclick="showMainMenu()">GO!</button>
+            <p class="welcome-text">Let's go and get you fluency NOW!</p>
+            <p style="font-size: 14px; color: #718096; margin-top: 20px;">✨ Works offline - no internet required!</p>
+            <button onclick="app.showMainMenu()">GO!</button>
         </div>
 
         <!-- Main Menu -->
         <div id="mainMenu" class="screen hidden">
             <h1>Main Menu</h1>
-            <button class="menu-button" onclick="showTestYourself()">Test Yourself</button>
-            <button class="back-button" onclick="showWelcome()">Back</button>
+            <button class="menu-button" onclick="app.showExercises()">Exercises</button>
+            <button class="menu-button" onclick="app.showTestYourself()">Test Yourself</button>
+        </div>
+
+        <!-- Exercises Menu -->
+        <div id="exercisesMenu" class="screen hidden">
+            <h2>Choose Category</h2>
+            <button class="category-button" onclick="app.showSimpleMenu()">Simple Tenses</button>
+            <button class="category-button" onclick="app.showContinuousMenu()">Continuous Tenses</button>
+            <button class="back-button" onclick="app.showMainMenu()">Back to Main Menu</button>
+        </div>
+        
+        <!-- Simple Tenses Menu -->
+        <div id="simpleMenu" class="screen hidden">
+            <h2>Simple Tenses</h2>
+            <button class="menu-button" onclick="app.startExercise('present')">Present Simple</button>
+            <button class="menu-button" onclick="app.startExercise('past')">Past Simple</button>
+            <button class="menu-button" onclick="app.startExercise('future')">Future Simple</button>
+            <button class="menu-button" onclick="app.startExercise('presentPerfect')">Present Perfect</button>
+            <button class="menu-button" onclick="app.startExercise('pastPerfect')">Past Perfect</button>
+            <button class="back-button" onclick="app.showExercises()">Back to Categories</button>
+        </div>
+        
+        <!-- Continuous Tenses Menu -->
+        <div id="continuousMenu" class="screen hidden">
+            <h2>Continuous Tenses</h2>
+            <button class="menu-button" onclick="app.startExercise('presentContinuous')">Present Continuous</button>
+            <button class="menu-button" onclick="app.startExercise('pastContinuous')">Past Continuous</button>
+            <button class="menu-button" onclick="app.startExercise('futureContinuous')">Future Continuous</button>
+            <button class="menu-button" onclick="app.startExercise('presentPerfectContinuous')">Present Perfect Continuous</button>
+            <button class="menu-button" onclick="app.startExercise('pastPerfectContinuous')">Past Perfect Continuous</button>
+            <button class="back-button" onclick="app.showExercises()">Back to Categories</button>
+        </div>
+
+        <!-- Universal Exercise Template -->
+        <div id="exerciseTemplate" class="screen exercise-screen hidden">
+            <h2 id="exerciseTitle">Exercise Title</h2>
+            <p class="exercise-title" id="exerciseSubtitle">Practice changing subjects while keeping the same verb</p>
+            
+            <div class="verb-info" id="currentVerbInfo">Current verb: go</div>
+            <button class="rules-button" onclick="app.showRules()">📚 Rules</button>
+            
+            <div class="exercise-container" onclick="app.toggleExamples()">
+                <div id="sentenceDisplay">
+                    <div class="sentence" id="sentence1">Loading...</div>
+                    <div class="sentence" id="sentence2">Loading...</div>
+                    <div class="sentence" id="sentence3">Loading...</div>
+                    <div class="sentence" id="sentence4">Loading...</div>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="error-message hidden"></div>
+
+            <div class="navigation-buttons">
+                <div class="button-row">
+                    <button class="nav-button" onclick="app.previousSubject()">Back</button>
+                    <button class="nav-button next-button" onclick="app.nextSubject()">Next</button>
+                </div>
+                <div class="button-row">
+                    <button class="nav-button" onclick="app.playAudio()">🔊 Play</button>
+                    <button class="nav-button" onclick="app.changeVerb()">Change the Word</button>
+                </div>
+                <button class="back-button" id="exerciseBackButton" onclick="app.goBack()">Back</button>
+            </div>
         </div>
 
         <!-- Test Yourself -->
         <div id="testYourself" class="screen hidden">
             <h2>Test Yourself</h2>
-            <p style="margin-bottom: 20px;">Form the positive statement, negative, question and wh-question. Click to check your answer.</p>
+            <p class="exercise-title">Form the positive statement, negative, question and wh-question using the given subject, verb and tense. Click to check your answer.</p>
             
-            <div class="exercise-container" onclick="revealNext()">
-                <div id="taskArea">
-                    <div class="russian" id="taskSentence">Loading...</div>
-                    <div class="english hidden" id="answer1"></div>
-                    <div class="english hidden" id="answer2"></div>
-                    <div class="english hidden" id="answer3"></div>
-                    <div class="english hidden" id="answer4"></div>
+            <div class="exercise-container" id="testContainer" onclick="app.revealNext()">
+                <div class="test-item">
+                    <div class="russian" id="russianSentence">Loading...</div>
+                    <div class="english hidden" id="englishPositive"></div>
+                    <div class="english hidden" id="englishNegative"></div>
+                    <div class="english hidden" id="englishQuestion"></div>
+                    <div class="english hidden" id="englishWhQuestion"></div>
                 </div>
             </div>
             
-            <button class="nav-button" onclick="generateNewTest()">New Example</button>
-            <button class="back-button" onclick="showMainMenu()">Back to Menu</button>
+            <div id="testError" class="error-message hidden"></div>
+            
+            <div class="navigation-buttons">
+                <button class="nav-button" onclick="app.generateNewTest()">New Example</button>
+                <button class="back-button" onclick="app.showMainMenu()">Back to Main Menu</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Simple state management
-        let currentRevealStage = 0;
-        let currentTestData = null;
-
-        // Navigation functions
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.add('hidden');
-            });
-            document.getElementById(screenId).classList.remove('hidden');
-        }
-
-        function showWelcome() {
-            showScreen('welcomeScreen');
-        }
-
-        function showMainMenu() {
-            showScreen('mainMenu');
-        }
-
-        function showTestYourself() {
-            showScreen('testYourself');
-            generateNewTest();
-        }
-
-        // Simple verb data for testing
-        const testData = {
-            verbs: ['go', 'play', 'work', 'study', 'read', 'write', 'speak', 'eat', 'sleep', 'run'],
-            subjects: ['I', 'you', 'he', 'she', 'it', 'we', 'they'],
-            tenses: ['Present Simple', 'Past Simple', 'Future Simple']
-        };
-
-        // Generate test examples
-        function generateExample(subject, verb, tense) {
-            const examples = {
-                'Present Simple': {
-                    'I': {
-                        'go': ['I go', "I don't go", 'Do I go?', 'Where do I go?'],
-                        'play': ['I play', "I don't play", 'Do I play?', 'What do I play?'],
-                        'work': ['I work', "I don't work", 'Do I work?', 'Where do I work?']
-                    },
-                    'he': {
-                        'go': ['he goes', "he doesn't go", 'Does he go?', 'Where does he go?'],
-                        'play': ['he plays', "he doesn't play", 'Does he play?', 'What does he play?'],
-                        'work': ['he works', "he doesn't work", 'Does he work?', 'Where does he work?']
-                    },
-                    'she': {
-                        'go': ['she goes', "she doesn't go", 'Does she go?', 'Where does she go?'],
-                        'play': ['she plays', "she doesn't play", 'Does she play?', 'What does she play?'],
-                        'work': ['she works', "she doesn't work", 'Does she work?', 'Where does she work?']
+        // Application State Manager
+        const app = {
+            // Current state
+            currentTense: null,
+            currentVerb: 'go',
+            currentSubjectIndex: 0,
+            isLoading: false,
+            audioEnabled: true,
+            currentRulesLanguage: 'russian',
+            examplesHidden: false,
+            
+            // Test state
+            revealStage: 0,
+            currentTestData: null,
+            
+            // Navigation history for back button
+            navigationHistory: [],
+            
+            // Initialize
+            init() {
+                this.showScreen('welcomeScreen');
+            },
+            
+            // Toggle examples visibility
+            toggleExamples() {
+                this.examplesHidden = !this.examplesHidden;
+                const sentences = ['sentence2', 'sentence3', 'sentence4'];
+                
+                sentences.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        if (this.examplesHidden) {
+                            element.style.display = 'none';
+                        } else {
+                            element.style.display = 'block';
+                        }
                     }
-                },
-                'Past Simple': {
-                    'I': {
-                        'go': ['I went', "I didn't go", 'Did I go?', 'Where did I go?'],
-                        'play': ['I played', "I didn't play", 'Did I play?', 'What did I play?'],
-                        'work': ['I worked', "I didn't work", 'Did I work?', 'Where did I work?']
-                    },
-                    'he': {
-                        'go': ['he went', "he didn't go", 'Did he go?', 'Where did he go?'],
-                        'play': ['he played', "he didn't play", 'Did he play?', 'What did he play?'],
-                        'work': ['he worked', "he didn't work", 'Did he work?', 'Where did he work?']
+                });
+            },
+            
+            // Apply hidden state
+            applyExamplesVisibility() {
+                if (this.examplesHidden) {
+                    const sentences = ['sentence2', 'sentence3', 'sentence4'];
+                    sentences.forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.style.display = 'none';
+                        }
+                    });
+                }
+            },
+            
+            // Screen management
+            showScreen(screenId) {
+                document.querySelectorAll('.screen').forEach(screen => {
+                    screen.classList.add('hidden');
+                });
+                document.getElementById(screenId).classList.remove('hidden');
+            },
+            
+            showMainMenu() {
+                this.navigationHistory = ['mainMenu'];
+                this.showScreen('mainMenu');
+            },
+            
+            showExercises() {
+                this.navigationHistory.push('exercisesMenu');
+                this.showScreen('exercisesMenu');
+            },
+            
+            showSimpleMenu() {
+                this.navigationHistory.push('simpleMenu');
+                this.showScreen('simpleMenu');
+            },
+            
+            showContinuousMenu() {
+                this.navigationHistory.push('continuousMenu');
+                this.showScreen('continuousMenu');
+            },
+            
+            showTestYourself() {
+                this.navigationHistory.push('testYourself');
+                this.showScreen('testYourself');
+                this.generateNewTest();
+            },
+            
+            goBack() {
+                if (this.navigationHistory.length > 1) {
+                    this.navigationHistory.pop();
+                    const previousScreen = this.navigationHistory[this.navigationHistory.length - 1];
+                    this.showScreen(previousScreen);
+                }
+            },
+            
+            // Exercise management
+            startExercise(tense) {
+                this.currentTense = tense;
+                this.currentSubjectIndex = 0;
+                this.currentVerb = 'go';
+                
+                // Reset examples visibility to shown
+                this.examplesHidden = false;
+                const sentences = ['sentence2', 'sentence3', 'sentence4'];
+                sentences.forEach(id => {
+                    document.getElementById(id).style.display = 'block';
+                });
+                
+                // Update title and back button
+                const titles = {
+                    'present': 'Present Simple',
+                    'past': 'Past Simple', 
+                    'future': 'Future Simple',
+                    'presentPerfect': 'Present Perfect',
+                    'pastPerfect': 'Past Perfect',
+                    'presentContinuous': 'Present Continuous',
+                    'pastContinuous': 'Past Continuous',
+                    'futureContinuous': 'Future Continuous',
+                    'presentPerfectContinuous': 'Present Perfect Continuous',
+                    'pastPerfectContinuous': 'Past Perfect Continuous'
+                };
+                
+                document.getElementById('exerciseTitle').textContent = titles[tense];
+                
+                // Set appropriate back navigation
+                const backButton = document.getElementById('exerciseBackButton');
+                if (['present', 'past', 'future', 'presentPerfect', 'pastPerfect'].includes(tense)) {
+                    backButton.onclick = () => this.showSimpleMenu();
+                } else {
+                    backButton.onclick = () => this.showContinuousMenu();
+                }
+                
+                this.navigationHistory.push('exerciseTemplate');
+                this.showScreen('exerciseTemplate');
+                this.updateExerciseDisplay();
+            },
+            
+            updateExerciseDisplay() {
+                if (this.isLoading) return;
+                
+                const subject = data.allSubjects[this.currentSubjectIndex];
+                const verbData = data.getVerbData(this.currentVerb, this.currentTense, subject);
+                
+                if (verbData) {
+                    document.getElementById('sentence1').textContent = verbData.positive;
+                    document.getElementById('sentence2').textContent = verbData.negative;
+                    document.getElementById('sentence3').textContent = verbData.question;
+                    document.getElementById('sentence4').textContent = verbData.whQuestion;
+                }
+                
+                // Update verb info
+                const russianInfinitive = data.verbInfinitives[this.currentVerb] || '';
+                const threeFormsDisplay = data.verbForms[this.currentVerb] ? 
+                    `<br>(${data.verbForms[this.currentVerb]})` : '';
+                document.getElementById('currentVerbInfo').innerHTML = 
+                    `Current verb: ${this.currentVerb} - ${russianInfinitive}${threeFormsDisplay}`;
+                
+                // Apply hidden state
+                this.applyExamplesVisibility();
+            },
+            
+            nextSubject() {
+                if (!this.isLoading) {
+                    this.currentSubjectIndex++;
+                    if (this.currentSubjectIndex >= data.allSubjects.length) {
+                        this.currentSubjectIndex = 0;
                     }
-                },
-                'Future Simple': {
-                    'I': {
-                        'go': ['I will go', "I won't go", 'Will I go?', 'Where will I go?'],
-                        'play': ['I will play', "I won't play", 'Will I play?', 'What will I play?'],
-                        'work': ['I will work', "I won't work", 'Will I work?', 'Where will I work?']
-                    },
-                    'he': {
-                        'go': ['he will go', "he won't go", 'Will he go?', 'Where will he go?'],
-                        'play': ['he will play', "he won't play", 'Will he play?', 'What will he play?'],
-                        'work': ['he will work', "he won't work", 'Will he work?', 'Where will he work?']
+                    this.updateExerciseDisplay();
+                }
+            },
+            
+            previousSubject() {
+                if (!this.isLoading) {
+                    this.currentSubjectIndex--;
+                    if (this.currentSubjectIndex < 0) {
+                        this.currentSubjectIndex = data.allSubjects.length - 1;
+                    }
+                    this.updateExerciseDisplay();
+                }
+            },
+            
+            changeVerb() {
+                if (this.isLoading) return;
+                
+                const verbs = Object.keys(data.verbInfinitives);
+                let newVerb;
+                let attempts = 0;
+                
+                do {
+                    newVerb = verbs[Math.floor(Math.random() * verbs.length)];
+                    attempts++;
+                    if (attempts > 10 && newVerb === this.currentVerb) {
+                        newVerb = 'play';
+                    }
+                } while (newVerb === this.currentVerb);
+                
+                this.currentVerb = newVerb;
+                this.currentSubjectIndex = Math.floor(Math.random() * data.allSubjects.length);
+                this.updateExerciseDisplay();
+            },
+            
+            // Audio functions
+            speak(text) {
+                if ('speechSynthesis' in window && this.audioEnabled) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    utterance.volume = 1;
+                    window.speechSynthesis.speak(utterance);
+                }
+            },
+            
+            playAudio() {
+                const sentences = [
+                    document.getElementById('sentence1').textContent,
+                    document.getElementById('sentence2').textContent,
+                    document.getElementById('sentence3').textContent,
+                    document.getElementById('sentence4').textContent
+                ];
+                
+                let index = 0;
+                const speakNext = () => {
+                    if (index < sentences.length) {
+                        this.speak(sentences[index]);
+                        index++;
+                        setTimeout(speakNext, 2000);
+                    }
+                };
+                speakNext();
+            },
+            
+            // Rules modal
+            showRules() {
+                const modalOverlay = document.createElement('div');
+                modalOverlay.className = 'modal-overlay';
+                modalOverlay.id = 'rulesModal';
+                modalOverlay.onclick = (e) => {
+                    if (e.target === modalOverlay) {
+                        this.closeRules();
+                    }
+                };
+                
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                
+                const closeButton = document.createElement('button');
+                closeButton.className = 'modal-close';
+                closeButton.innerHTML = '×';
+                closeButton.onclick = () => this.closeRules();
+                
+                const title = document.createElement('h3');
+                title.className = 'modal-title';
+                
+                const tenseConfig = data.tenseConfig[this.currentTense];
+                title.textContent = tenseConfig.name + ' Rules';
+                
+                const description = document.createElement('div');
+                description.className = 'modal-description';
+                description.id = 'rulesDescription';
+                description.textContent = data.tenseRules[this.currentTense][this.currentRulesLanguage];
+                description.onclick = () => this.toggleRulesLanguage();
+                
+                modalContent.appendChild(closeButton);
+                modalContent.appendChild(title);
+                modalContent.appendChild(description);
+                modalOverlay.appendChild(modalContent);
+                
+                document.body.appendChild(modalOverlay);
+                this.currentRulesLanguage = 'russian';
+            },
+            
+            closeRules() {
+                const modal = document.getElementById('rulesModal');
+                if (modal) modal.remove();
+            },
+            
+            toggleRulesLanguage() {
+                this.currentRulesLanguage = 
+                    this.currentRulesLanguage === 'russian' ? 'english' : 'russian';
+                const description = document.getElementById('rulesDescription');
+                if (description) {
+                    description.textContent = 
+                        data.tenseRules[this.currentTense][this.currentRulesLanguage];
+                }
+            },
+            
+            // Test Yourself functions
+            generateNewTest() {
+                this.revealStage = 0;
+                
+                document.getElementById('testContainer').classList.remove('complete');
+                document.getElementById('russianSentence').style.display = 'block';
+                document.getElementById('russianSentence').classList.remove('hidden');
+                document.querySelectorAll('.english').forEach(el => {
+                    el.classList.add('hidden');
+                    el.style.display = 'none';
+                });
+                
+                let verbData = null;
+                let randomSubject, randomVerb, randomTense;
+                
+                // Keep trying until we get a valid combination
+                let attempts = 0;
+                while (!verbData && attempts < 50) {
+                    randomSubject = data.allSubjects[Math.floor(Math.random() * data.allSubjects.length)];
+                    const verbs = Object.keys(data.verbInfinitives);
+                    randomVerb = verbs[Math.floor(Math.random() * verbs.length)];
+                    const tenses = Object.keys(data.tenseConfig);
+                    randomTense = tenses[Math.floor(Math.random() * tenses.length)];
+                    
+                    verbData = data.getVerbData(randomVerb, randomTense, randomSubject);
+                    attempts++;
+                }
+                
+                if (verbData) {
+                    const russianEl = document.getElementById('russianSentence');
+                    const tenseConfig = data.tenseConfig[randomTense];
+                    
+                    // Display subject + (infinitive verb) instead of Russian
+                    russianEl.innerHTML = `
+                        <span class="tense-badge ${tenseConfig.class}" 
+                              aria-label="Use ${tenseConfig.name} tense">
+                            ⏱ ${tenseConfig.name}
+                        </span>
+                        ${randomSubject} (${randomVerb})
+                    `;
+                    
+                    document.getElementById('englishPositive').textContent = verbData.positive;
+                    document.getElementById('englishNegative').textContent = verbData.negative;
+                    document.getElementById('englishQuestion').textContent = verbData.question;
+                    document.getElementById('englishWhQuestion').textContent = verbData.whQuestion;
+                    
+                    this.currentTestData = {
+                        sentences: [
+                            verbData.positive,
+                            verbData.negative,
+                            verbData.question,
+                            verbData.whQuestion
+                        ]
+                    };
+                }
+            },
+            
+            revealNext() {
+                const elements = [
+                    'englishPositive',
+                    'englishNegative', 
+                    'englishQuestion',
+                    'englishWhQuestion'
+                ];
+                
+                if (this.revealStage < elements.length) {
+                    const element = document.getElementById(elements[this.revealStage]);
+                    element.classList.remove('hidden');
+                    element.style.cssText = 
+                        'display: block !important; visibility: visible !important; opacity: 1 !important;';
+                    this.revealStage++;
+                    
+                    if (this.revealStage === elements.length) {
+                        document.getElementById('testContainer').classList.add('complete');
                     }
                 }
-            };
-
-            // Default responses for any subject/verb/tense combination
-            if (!examples[tense] || !examples[tense][subject] || !examples[tense][subject][verb]) {
-                // Generate generic responses
-                if (tense === 'Present Simple') {
-                    const thirdPerson = ['he', 'she', 'it'].includes(subject);
-                    const verbForm = thirdPerson ? verb + 's' : verb;
-                    const aux = thirdPerson ? 'does' : 'do';
-                    const auxNeg = thirdPerson ? "doesn't" : "don't";
-                    return [
-                        `${subject} ${verbForm}`,
-                        `${subject} ${auxNeg} ${verb}`,
-                        `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} ${verb}?`,
-                        `What ${aux} ${subject} ${verb}?`
-                    ];
-                } else if (tense === 'Past Simple') {
-                    return [
-                        `${subject} ${verb}ed`,
-                        `${subject} didn't ${verb}`,
-                        `Did ${subject} ${verb}?`,
-                        `What did ${subject} ${verb}?`
-                    ];
-                } else if (tense === 'Future Simple') {
-                    return [
-                        `${subject} will ${verb}`,
-                        `${subject} won't ${verb}`,
-                        `Will ${subject} ${verb}?`,
-                        `What will ${subject} ${verb}?`
-                    ];
-                }
             }
-
-            return examples[tense][subject][verb];
-        }
-
-        // Generate new test
-        function generateNewTest() {
-            currentRevealStage = 0;
-            
-            // Hide all answers
-            document.querySelectorAll('.english').forEach(el => {
-                el.classList.add('hidden');
-            });
-            
-            // Pick random elements
-            const subject = testData.subjects[Math.floor(Math.random() * testData.subjects.length)];
-            const verb = testData.verbs[Math.floor(Math.random() * testData.verbs.length)];
-            const tense = testData.tenses[Math.floor(Math.random() * testData.tenses.length)];
-            
-            // Display task
-            const taskEl = document.getElementById('taskSentence');
-            taskEl.innerHTML = `
-                <span class="tense-badge">${tense}</span>
-                ${subject} (${verb})
-            `;
-            
-            // Get answers
-            const answers = generateExample(subject, verb, tense);
-            if (answers) {
-                currentTestData = answers;
-                document.getElementById('answer1').textContent = answers[0];
-                document.getElementById('answer2').textContent = answers[1];
-                document.getElementById('answer3').textContent = answers[2];
-                document.getElementById('answer4').textContent = answers[3];
-            }
-        }
-
-        // Reveal answers one by one
-        function revealNext() {
-            if (!currentTestData) return;
-            
-            const answerIds = ['answer1', 'answer2', 'answer3', 'answer4'];
-            
-            if (currentRevealStage < answerIds.length) {
-                document.getElementById(answerIds[currentRevealStage]).classList.remove('hidden');
-                currentRevealStage++;
-            }
-        }
-
-        // Initialize on load
-        window.onload = function() {
-            showWelcome();
         };
+
+        // Data Module
+        const data = {
+            // Tense configuration
+            tenseConfig: {
+                'present': { name: 'Present Simple', class: 'present' },
+                'past': { name: 'Past Simple', class: 'past' },
+                'future': { name: 'Future Simple', class: 'future' },
+                'presentPerfect': { name: 'Present Perfect', class: 'present-perfect' },
+                'pastPerfect': { name: 'Past Perfect', class: 'past-perfect' },
+                'presentContinuous': { name: 'Present Continuous', class: 'present-continuous' },
+                'pastContinuous': { name: 'Past Continuous', class: 'past-continuous' },
+                'futureContinuous': { name: 'Future Continuous', class: 'future-continuous' },
+                'presentPerfectContinuous': { name: 'Present Perfect Continuous', class: 'present-perfect-continuous' },
+                'pastPerfectContinuous': { name: 'Past Perfect Continuous', class: 'past-perfect-continuous' }
+            },
+            
+            // All subjects
+            allSubjects: ['I', 'you', 'he', 'she', 'it', 'we', 'they'],
+            
+            // Russian infinitive forms
+            verbInfinitives: {
+                'be': 'быть',
+                'beat': 'бить',
+                'become': 'становиться',
+                'begin': 'начинать',
+                'break': 'ломать',
+                'bring': 'приносить',
+                'build': 'строить',
+                'buy': 'покупать',
+                'catch': 'ловить',
+                'choose': 'выбирать',
+                'come': 'приходить',
+                'cost': 'стоить',
+                'do': 'делать',
+                'draw': 'рисовать',
+                'dream': 'мечтать',
+                'drink': 'пить',
+                'drive': 'водить машину',
+                'eat': 'есть',
+                'fall': 'падать',
+                'feel': 'чувствовать',
+                'find': 'находить',
+                'fix': 'чинить',
+                'fly': 'летать',
+                'get': 'получать',
+                'give': 'давать',
+                'go': 'идти',
+                'grow': 'расти',
+                'have': 'иметь',
+                'hear': 'слышать',
+                'know': 'знать',
+                'learn': 'учиться',
+                'leave': 'уходить',
+                'lie': 'лежать',
+                'make': 'делать',
+                'meet': 'встречать',
+                'play': 'играть',
+                'put': 'класть',
+                'read': 'читать',
+                'run': 'бегать',
+                'say': 'говорить',
+                'see': 'видеть',
+                'seek': 'искать',
+                'show': 'показывать',
+                'sing': 'петь',
+                'sit': 'сидеть',
+                'sleep': 'спать',
+                'speak': 'говорить',
+                'stand': 'стоять',
+                'study': 'учиться',
+                'swim': 'плавать',
+                'take': 'брать',
+                'teach': 'учить',
+                'tell': 'рассказывать',
+                'think': 'думать',
+                'throw': 'бросать',
+                'understand': 'понимать',
+                'work': 'работать',
+                'write': 'писать',
+                'cry': 'плакать'
+            },
+            
+            // Three forms of verbs
+            verbForms: {
+                'be': 'be-was/were-been',
+                'beat': 'beat-beat-beaten',
+                'become': 'become-became-become',
+                'begin': 'begin-began-begun',
+                'break': 'break-broke-broken',
+                'bring': 'bring-brought-brought',
+                'build': 'build-built-built',
+                'buy': 'buy-bought-bought',
+                'catch': 'catch-caught-caught',
+                'choose': 'choose-chose-chosen',
+                'come': 'come-came-come',
+                'cost': 'cost-cost-cost',
+                'do': 'do-did-done',
+                'draw': 'draw-drew-drawn',
+                'dream': 'dream-dreamt-dreamt',
+                'drink': 'drink-drank-drunk',
+                'drive': 'drive-drove-driven',
+                'eat': 'eat-ate-eaten',
+                'fall': 'fall-fell-fallen',
+                'feel': 'feel-felt-felt',
+                'find': 'find-found-found',
+                'fix': 'fix-fixed-fixed',
+                'fly': 'fly-flew-flown',
+                'get': 'get-got-got',
+                'give': 'give-gave-given',
+                'go': 'go-went-gone',
+                'grow': 'grow-grew-grown',
+                'have': 'have-had-had',
+                'hear': 'hear-heard-heard',
+                'know': 'know-knew-known',
+                'learn': 'learn-learnt-learnt',
+                'leave': 'leave-left-left',
+                'lie': 'lie-lay-lain',
+                'make': 'make-made-made',
+                'meet': 'meet-met-met',
+                'play': 'play-played-played',
+                'put': 'put-put-put',
+                'read': 'read-read-read',
+                'run': 'run-ran-run',
+                'say': 'say-said-said',
+                'see': 'see-saw-seen',
+                'seek': 'seek-sought-sought',
+                'show': 'show-showed-shown',
+                'sing': 'sing-sang-sung',
+                'sit': 'sit-sat-sat',
+                'sleep': 'sleep-slept-slept',
+                'speak': 'speak-spoke-spoken',
+                'stand': 'stand-stood-stood',
+                'study': 'study-studied-studied',
+                'swim': 'swim-swam-swum',
+                'take': 'take-took-taken',
+                'teach': 'teach-taught-taught',
+                'tell': 'tell-told-told',
+                'think': 'think-thought-thought',
+                'throw': 'throw-threw-thrown',
+                'understand': 'understand-understood-understood',
+                'work': 'work-worked-worked',
+                'write': 'write-wrote-written',
+                'cry': 'cry-cried-cried'
+            },
+            
+            // Tense rules
+            tenseRules: {
+                present: {
+                    english: "Used for habits, routines, general truths, and scheduled events. It describes actions that happen regularly or are always true.",
+                    russian: "Используется для описания привычек, рутинных действий, общих истин и запланированных событий. Описывает действия, которые происходят регулярно или всегда верны."
+                },
+                past: {
+                    english: "Used for completed actions in the past, past habits, and actions with a specific time. It describes things that are finished, often with a specific time or date.",
+                    russian: "Используется для описания завершенных действий в прошлом, прошлых привычек и действий с указанием конкретного времени в прошлом. Описывает завершенные действия, часто с указанием конкретного времени или даты. События и факты из прошлого, следующие один за другим."
+                },
+                future: {
+                    english: "Used for predictions, spontaneous decisions, promises, and scheduled events. It describes actions that will happen in the future, whether planned or not.",
+                    russian: "Используется для предсказаний, обещаний и запланированных событий. Описывает действия, которые произойдут в будущем, запланированные или нет."
+                },
+                presentPerfect: {
+                    english: "Used for actions that started in the past and continue to the present, actions at an unspecified time, actions connected to the present, and recent actions. It shows a link between the past and the present.",
+                    russian: "Используется для действий, начавшихся в прошлом и продолжающихся в настоящем (я прожил здесь 10 лет), обозначения опыта/прецедента (я бывал в Калифорнии) и результат действий на данный момент (я сделал работу). Показывает связь между прошлым и настоящим."
+                },
+                pastPerfect: {
+                    english: "Used for actions that happened before another action in the past or before a specific time in the past, and in reported speech. It helps sequence events in the past.",
+                    russian: "Используется для действий, произошедших до другого действия в прошлом или до определенного времени в прошлом, а также в косвенной речи. Помогает упорядочить события в прошлом."
+                },
+                presentContinuous: {
+                    english: "Used for actions happening right now, temporary situations, planned future arrangements, and annoying habits. Describes ongoing actions at the moment of speaking.",
+                    russian: "Используется для действий, происходящих прямо сейчас, временных ситуаций, запланированных будущих мероприятий и раздражающих привычек. Описывает продолжающиеся действия в момент речи."
+                },
+                pastContinuous: {
+                    english: "Used for actions that were in progress at a specific time in the past, background actions, interrupted actions, and parallel actions in the past.",
+                    russian: "Используется для действий, которые происходили в определенный момент в прошлом, фоновых действий, прерванных действий и параллельных действий в прошлом."
+                },
+                futureContinuous: {
+                    english: "Used for actions that will be in progress at a specific time in the future, polite inquiries about plans, and events that will happen as a matter of course.",
+                    russian: "Используется для действий, которые будут происходить в определенный момент в будущем, вежливых вопросов о планах и событий, которые произойдут естественным образом."
+                },
+                presentPerfectContinuous: {
+                    english: "Used for actions that started in the past and are still continuing, or have just stopped but have present results. Emphasizes the duration of the action.",
+                    russian: "Используется для действий, которые начались в прошлом и все еще продолжаются, или только что закончились, но имеют результат в настоящем. Подчеркивает продолжительность действия."
+                },
+                pastPerfectContinuous: {
+                    english: "Used for actions that had been in progress before another action or time in the past. Shows the duration of an action up to a certain point in the past.",
+                    russian: "Используется для действий, которые продолжались до другого действия или момента в прошлом. Показывает продолжительность действия до определенного момента в прошлом."
+                }
+            },
+            
+            // Function to get verb data with all tense generation
+            getVerbData(verb, tense, subject) {
+                // Handle special verb "be"
+                if (verb === 'be') {
+                    return this.getBeVerbData(tense, subject);
+                }
+                
+                // Get appropriate wh-question word
+                const whWord = this.getWhQuestionWord(verb, tense);
+                
+                // Generate forms based on tense
+                switch(tense) {
+                    case 'present':
+                        return this.getPresentSimple(verb, subject, whWord);
+                    case 'past':
+                        return this.getPastSimple(verb, subject, whWord);
+                    case 'future':
+                        return this.getFutureSimple(verb, subject, whWord);
+                    case 'presentPerfect':
+                        return this.getPresentPerfect(verb, subject, whWord);
+                    case 'pastPerfect':
+                        return this.getPastPerfect(verb, subject, whWord);
+                    case 'presentContinuous':
+                        return this.getPresentContinuous(verb, subject, whWord);
+                    case 'pastContinuous':
+                        return this.getPastContinuous(verb, subject, whWord);
+                    case 'futureContinuous':
+                        return this.getFutureContinuous(verb, subject, whWord);
+                    case 'presentPerfectContinuous':
+                        return this.getPresentPerfectContinuous(verb, subject, whWord);
+                    case 'pastPerfectContinuous':
+                        return this.getPastPerfectContinuous(verb, subject, whWord);
+                    default:
+                        return null;
+                }
+            },
+            
+            // Handle special verb "be"
+            getBeVerbData(tense, subject) {
+                const forms = {
+                    present: {
+                        'I': { positive: 'I am', negative: 'I am not', question: 'Am I?', whQuestion: 'Who am I?' },
+                        'you': { positive: 'you are', negative: 'you are not', question: 'Are you?', whQuestion: 'Who are you?' },
+                        'he': { positive: 'he is', negative: 'he is not', question: 'Is he?', whQuestion: 'Who is he?' },
+                        'she': { positive: 'she is', negative: 'she is not', question: 'Is she?', whQuestion: 'Who is she?' },
+                        'it': { positive: 'it is', negative: 'it is not', question: 'Is it?', whQuestion: 'What is it?' },
+                        'we': { positive: 'we are', negative: 'we are not', question: 'Are we?', whQuestion: 'Who are we?' },
+                        'they': { positive: 'they are', negative: 'they are not', question: 'Are they?', whQuestion: 'Who are they?' }
+                    },
+                    past: {
+                        'I': { positive: 'I was', negative: 'I was not', question: 'Was I?', whQuestion: 'Who was I?' },
+                        'you': { positive: 'you were', negative: 'you were not', question: 'Were you?', whQuestion: 'Who were you?' },
+                        'he': { positive: 'he was', negative: 'he was not', question: 'Was he?', whQuestion: 'Who was he?' },
+                        'she': { positive: 'she was', negative: 'she was not', question: 'Was she?', whQuestion: 'Who was she?' },
+                        'it': { positive: 'it was', negative: 'it was not', question: 'Was it?', whQuestion: 'What was it?' },
+                        'we': { positive: 'we were', negative: 'we were not', question: 'Were we?', whQuestion: 'Who were we?' },
+                        'they': { positive: 'they were', negative: 'they were not', question: 'Were they?', whQuestion: 'Who were they?' }
+                    }
+                };
+                
+                if (forms[tense] && forms[tense][subject]) {
+                    return forms[tense][subject];
+                }
+                
+                // For other tenses, generate normally
+                return null;
+            },
+            
+            // Present Simple
+            getPresentSimple(verb, subject, whWord) {
+                const thirdPerson = ['he', 'she', 'it'].includes(subject);
+                const verbForm = thirdPerson ? this.getThirdPersonForm(verb) : verb;
+                const aux = thirdPerson ? 'does' : 'do';
+                const auxNeg = thirdPerson ? "doesn't" : "don't";
+                
+                return {
+                    positive: `${subject} ${verbForm}`,
+                    negative: `${subject} ${auxNeg} ${verb}`,
+                    question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} ${verb}?`,
+                    whQuestion: this.formatWhQuestion(whWord, `${aux} ${subject}`, verb)
+                };
+            },
+            
+            // Past Simple
+            getPastSimple(verb, subject, whWord) {
+                const pastForm = this.getPastForm(verb);
+                
+                return {
+                    positive: `${subject} ${pastForm}`,
+                    negative: `${subject} didn't ${verb}`,
+                    question: `Did ${subject} ${verb}?`,
+                    whQuestion: this.formatWhQuestion(whWord, `did ${subject}`, verb)
+                };
+            },
+            
+            // Future Simple
+            getFutureSimple(verb, subject, whWord) {
+                return {
+                    positive: `${subject} will ${verb}`,
+                    negative: `${subject} won't ${verb}`,
+                    question: `Will ${subject} ${verb}?`,
+                    whQuestion: this.formatWhQuestion(whWord, `will ${subject}`, verb)
+                };
+            },
+            
+            // Present Perfect
+            getPresentPerfect(verb, subject, whWord) {
+                const aux = ['he', 'she', 'it'].includes(subject) ? 'has' : 'have';
+                const auxNeg = ['he', 'she', 'it'].includes(subject) ? "hasn't" : "haven't";
+                const pastParticiple = this.getPastParticiple(verb);
+                
+                return {
+                    positive: `${subject} ${aux} ${pastParticiple}`,
+                    negative: `${subject} ${auxNeg} ${pastParticiple}`,
+                    question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} ${pastParticiple}?`,
+                    whQuestion: this.formatWhQuestion(whWord, `${aux} ${subject}`, pastParticiple)
+                };
+            },
+            
+            // Past Perfect
+            getPastPerfect(verb, subject, whWord) {
+                const pastParticiple = this.getPastParticiple(verb);
+                
+                return {
+                    positive: `${subject} had ${pastParticiple}`,
+                    negative: `${subject} hadn't ${pastParticiple}`,
+                    question: `Had ${subject} ${pastParticiple}?`,
+                    whQuestion: this.formatWhQuestion(whWord, `had ${subject}`, pastParticiple)
+                };
+            },
+            
+            // Present Continuous
+            getPresentContinuous(verb, subject, whWord) {
+                const beForm = subject === 'I' ? 'am' : 
+                             ['he', 'she', 'it'].includes(subject) ? 'is' : 'are';
+                const beNeg = subject === 'I' ? 'am not' : 
+                            ['he', 'she', 'it'].includes(subject) ? 'is not' : 'are not';
+                const beQuestion = subject === 'I' ? 'Am' : 
+                                 ['he', 'she', 'it'].includes(subject) ? 'Is' : 'Are';
+                const ingForm = this.getIngForm(verb);
+                
+                return {
+                    positive: `${subject} ${beForm} ${ingForm}`,
+                    negative: `${subject} ${beNeg} ${ingForm}`,
+                    question: `${beQuestion} ${subject} ${ingForm}?`,
+                    whQuestion: this.formatWhQuestion(whWord, `${beForm} ${subject}`, ingForm)
+                };
+            },
+            
+            // Past Continuous
+            getPastContinuous(verb, subject, whWord) {
+                const wasWere = ['I', 'he', 'she', 'it'].includes(subject) ? 'was' : 'were';
+                const wasWereNeg = ['I', 'he', 'she', 'it'].includes(subject) ? 'was not' : 'were not';
+                const wasWereQuestion = ['I', 'he', 'she', 'it'].includes(subject) ? 'Was' : 'Were';
+                const ingForm = this.getIngForm(verb);
+                
+                return {
+                    positive: `${subject} ${wasWere} ${ingForm}`,
+                    negative: `${subject} ${wasWereNeg} ${ingForm}`,
+                    question: `${wasWereQuestion} ${subject} ${ingForm}?`,
+                    whQuestion: this.formatWhQuestion(whWord, `${wasWere} ${subject}`, ingForm)
+                };
+            },
+            
+            // Future Continuous
+            getFutureContinuous(verb, subject, whWord) {
+                const ingForm = this.getIngForm(verb);
+                
+                return {
+                    positive: `${subject} will be ${ingForm}`,
+                    negative: `${subject} won't be ${ingForm}`,
+                    question: `Will ${subject} be ${ingForm}?`,
+                    whQuestion: this.formatWhQuestion(whWord, `will ${subject} be`, ingForm)
+                };
+            },
+            
+            // Present Perfect Continuous
+            getPresentPerfectContinuous(verb, subject, whWord) {
+                const aux = ['he', 'she', 'it'].includes(subject) ? 'has' : 'have';
+                const auxNeg = ['he', 'she', 'it'].includes(subject) ? "hasn't" : "haven't";
+                const ingForm = this.getIngForm(verb);
+                
+                return {
+                    positive: `${subject} ${aux} been ${ingForm}`,
+                    negative: `${subject} ${auxNeg} been ${ingForm}`,
+                    question: `${aux.charAt(0).toUpperCase() + aux.slice(1)} ${subject} been ${ingForm}?`,
+                    whQuestion: this.formatWhQuestion(whWord, `${aux} ${subject} been`, ingForm)
+                };
+            },
+            
+            // Past Perfect Continuous
+            getPastPerfectContinuous(verb, subject, whWord) {
+                const ingForm = this.getIngForm(verb);
+                
+                return {
+                    positive: `${subject} had been ${ingForm}`,
+                    negative: `${subject} hadn't been ${ingForm}`,
+                    question: `Had ${subject} been ${ingForm}?`,
+                    whQuestion: this.formatWhQuestion(whWord, `had ${subject} been`, ingForm)
+                };
+            },
+            
+            // Helper: Get third person form
+            getThirdPersonForm(verb) {
+                if (verb.endsWith('s') || verb.endsWith('ss') || verb.endsWith('sh') || 
+                    verb.endsWith('ch') || verb.endsWith('x') || verb.endsWith('z')) {
+                    return verb + 'es';
+                }
+                if (verb.endsWith('y') && !/[aeiou]y$/.test(verb)) {
+                    return verb.slice(0, -1) + 'ies';
+                }
+                if (verb.endsWith('o')) {
+                    return verb + 'es';
+                }
+                return verb + 's';
+            },
+            
+            // Helper: Get past form
+            getPastForm(verb) {
+                const irregular = {
+                    'go': 'went', 'do': 'did', 'have': 'had', 'see': 'saw',
+                    'come': 'came', 'make': 'made', 'take': 'took', 'get': 'got',
+                    'give': 'gave', 'find': 'found', 'think': 'thought', 'know': 'knew',
+                    'say': 'said', 'tell': 'told', 'become': 'became', 'leave': 'left',
+                    'feel': 'felt', 'bring': 'brought', 'begin': 'began', 'keep': 'kept',
+                    'hold': 'held', 'write': 'wrote', 'stand': 'stood', 'hear': 'heard',
+                    'let': 'let', 'mean': 'meant', 'set': 'set', 'meet': 'met',
+                    'run': 'ran', 'pay': 'paid', 'sit': 'sat', 'speak': 'spoke',
+                    'lie': 'lay', 'lead': 'led', 'read': 'read', 'grow': 'grew',
+                    'lose': 'lost', 'fall': 'fell', 'send': 'sent', 'build': 'built',
+                    'understand': 'understood', 'draw': 'drew', 'break': 'broke', 'spend': 'spent',
+                    'cut': 'cut', 'rise': 'rose', 'drive': 'drove', 'buy': 'bought',
+                    'wear': 'wore', 'choose': 'chose', 'seek': 'sought', 'throw': 'threw',
+                    'catch': 'caught', 'deal': 'dealt', 'win': 'won', 'forget': 'forgot',
+                    'lay': 'laid', 'sell': 'sold', 'fight': 'fought', 'bear': 'bore',
+                    'teach': 'taught', 'sing': 'sang', 'strike': 'struck', 'hang': 'hung',
+                    'shake': 'shook', 'ride': 'rode', 'feed': 'fed', 'shoot': 'shot',
+                    'drink': 'drank', 'fly': 'flew', 'lead': 'led', 'swim': 'swam',
+                    'eat': 'ate', 'beat': 'beat', 'cost': 'cost', 'put': 'put',
+                    'shut': 'shut', 'hit': 'hit', 'hurt': 'hurt', 'sleep': 'slept',
+                    'dream': 'dreamt'
+                };
+                
+                if (irregular[verb]) return irregular[verb];
+                
+                // Regular verbs
+                if (verb.endsWith('e')) return verb + 'd';
+                if (verb.endsWith('y') && !/[aeiou]y$/.test(verb)) {
+                    return verb.slice(0, -1) + 'ied';
+                }
+                return verb + 'ed';
+            },
+            
+            // Helper: Get past participle
+            getPastParticiple(verb) {
+                const irregular = {
+                    'go': 'gone', 'do': 'done', 'see': 'seen', 'make': 'made',
+                    'take': 'taken', 'get': 'got', 'give': 'given', 'find': 'found',
+                    'think': 'thought', 'know': 'known', 'come': 'come', 'say': 'said',
+                    'tell': 'told', 'become': 'become', 'leave': 'left', 'feel': 'felt',
+                    'bring': 'brought', 'begin': 'begun', 'keep': 'kept', 'hold': 'held',
+                    'write': 'written', 'stand': 'stood', 'hear': 'heard', 'let': 'let',
+                    'mean': 'meant', 'set': 'set', 'meet': 'met', 'run': 'run',
+                    'pay': 'paid', 'sit': 'sat', 'speak': 'spoken', 'lie': 'lain',
+                    'lead': 'led', 'read': 'read', 'grow': 'grown', 'lose': 'lost',
+                    'fall': 'fallen', 'send': 'sent', 'build': 'built', 'understand': 'understood',
+                    'draw': 'drawn', 'break': 'broken', 'spend': 'spent', 'cut': 'cut',
+                    'rise': 'risen', 'drive': 'driven', 'buy': 'bought', 'wear': 'worn',
+                    'choose': 'chosen', 'seek': 'sought', 'throw': 'thrown', 'catch': 'caught',
+                    'deal': 'dealt', 'win': 'won', 'forget': 'forgotten', 'lay': 'laid',
+                    'sell': 'sold', 'fight': 'fought', 'bear': 'borne', 'teach': 'taught',
+                    'sing': 'sung', 'strike': 'struck', 'hang': 'hung', 'shake': 'shaken',
+                    'ride': 'ridden', 'feed': 'fed', 'shoot': 'shot', 'drink': 'drunk',
+                    'fly': 'flown', 'swim': 'swum', 'eat': 'eaten', 'beat': 'beaten',
+                    'cost': 'cost', 'put': 'put', 'shut': 'shut', 'hit': 'hit',
+                    'hurt': 'hurt', 'sleep': 'slept', 'dream': 'dreamt', 'have': 'had'
+                };
+                
+                if (irregular[verb]) return irregular[verb];
+                
+                // Regular verbs - same as past form
+                return this.getPastForm(verb);
+            },
+            
+            // Helper: Get -ing form
+            getIngForm(verb) {
+                // Special cases
+                const special = {
+                    'be': 'being', 'die': 'dying', 'lie': 'lying', 'tie': 'tying'
+                };
+                
+                if (special[verb]) return special[verb];
+                
+                // Verbs ending in -ie
+                if (verb.endsWith('ie')) {
+                    return verb.slice(0, -2) + 'ying';
+                }
+                
+                // Verbs ending in -e (but not -ee, -oe, -ye)
+                if (verb.endsWith('e') && !verb.endsWith('ee') && 
+                    !verb.endsWith('oe') && !verb.endsWith('ye')) {
+                    return verb.slice(0, -1) + 'ing';
+                }
+                
+                // Double consonant verbs
+                const doubleConsonant = ['run', 'sit', 'put', 'get', 'swim', 'stop', 'shop', 'drop', 'plan'];
+                if (doubleConsonant.includes(verb)) {
+                    return verb + verb[verb.length - 1] + 'ing';
+                }
+                
+                // Default
+                return verb + 'ing';
+            },
+            
+            // Helper: Get wh-question word
+            getWhQuestionWord(verb, tense) {
+                const whWords = {
+                    'go': 'Where', 'come': 'Where', 'live': 'Where', 'work': 'Where',
+                    'do': 'What', 'make': 'What', 'eat': 'What', 'drink': 'What',
+                    'buy': 'What', 'see': 'What', 'read': 'What', 'write': 'What',
+                    'say': 'What', 'think': 'What', 'know': 'What', 'want': 'What',
+                    'like': 'What', 'have': 'What', 'get': 'What', 'take': 'What',
+                    'give': 'What', 'find': 'What', 'lose': 'What', 'play': 'What',
+                    'watch': 'What', 'hear': 'What', 'feel': 'How', 'look': 'How',
+                    'meet': 'Who', 'call': 'Who', 'help': 'Who', 'teach': 'Who',
+                    'tell': 'Who', 'ask': 'Who', 'wait': 'Who', 'love': 'Who',
+                    'start': 'When', 'finish': 'When', 'begin': 'When', 'end': 'When',
+                    'leave': 'When', 'arrive': 'When', 'cost': 'How much',
+                    'be': 'Who'
+                };
+                
+                if (tense && tense.includes('PerfectContinuous')) {
+                    return 'How long';
+                }
+                
+                return whWords[verb] || 'What';
+            },
+            
+            // Helper: Format wh-question
+            formatWhQuestion(whWord, auxPattern, verb) {
+                if (!whWord || !auxPattern || !verb) {
+                    return `What ${auxPattern} ${verb}?`;
+                }
+                
+                if (whWord.includes('...')) {
+                    const parts = whWord.split('...');
+                    return `${parts[0]} ${auxPattern} ${verb} ${parts[1]}?`;
+                }
+                
+                return `${whWord} ${auxPattern} ${verb}?`;
+            }
+        };
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+        
+        // Make app available globally
+        window.app = app;
     </script>
 </body>
 </html>
