@@ -157,7 +157,7 @@
         }
         
         .exercise-container::after {
-            content: 'Click to hide/show examples';
+            content: 'Клик, чтобы скрыть/показать примеры';
             position: absolute;
             bottom: 5px;
             right: 10px;
@@ -189,10 +189,16 @@
         }
 
         .exercise-title {
-            font-size: 18px;
+            font-size: 16px;
             color: #718096;
             margin-bottom: 20px;
             font-style: italic;
+            line-height: 1.5;
+        }
+        
+        #testInstructions:hover {
+            text-decoration: underline;
+            color: #4a5568;
         }
 
         .hidden {
@@ -472,7 +478,7 @@
         }
         
         #testContainer:after {
-            content: 'Tap to reveal answer';
+            content: 'Клик для ответа';
             position: absolute;
             bottom: 10px;
             right: 10px;
@@ -482,7 +488,7 @@
         }
         
         #testContainer.complete:after {
-            content: 'Complete! Try a new example';
+            content: 'Готово! Попробуй новый пример';
         }
         
         .exercise-screen {
@@ -527,15 +533,26 @@
                 box-shadow: 0 2px 20px rgba(102, 126, 234, 0.6);
             }
         }
+        
+        @keyframes drillPulse {
+            0%, 100% {
+                transform: scaleY(1.1) scale(1);
+                filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+            }
+            50% {
+                transform: scaleY(1.1) scale(1.08);
+                filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.4));
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Welcome Screen -->
         <div id="welcomeScreen" class="screen">
-            <h1>Welcome to Grammardrillo!</h1>
-            <p class="welcome-text">Let's go and get you fluency NOW!</p>
-            <p style="font-size: 14px; color: #718096; margin-top: 20px;">✨ Works offline - no internet required!</p>
+            <h1 style="font-size: 22px; margin-bottom: 10px;">Welcome to <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 6px;">Grammar</span>drillo!</h1>
+            <p class="welcome-text" style="font-size: 42px; font-weight: bold; color: #2d3748; margin: 30px 0;">It's time to <strong style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-family: Impact, Arial Black, sans-serif; font-size: 64px; letter-spacing: 3px; text-shadow: none; display: inline-block; transform: scaleY(1.1); animation: drillPulse 2s ease-in-out infinite; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));">DRILL</strong></p>
+            <p style="font-size: 14px; color: #718096; margin-top: 20px;">✨ Все времена и неправильные глаголы</p>
             <button onclick="app.showMainMenu()">GO!</button>
         </div>
 
@@ -579,7 +596,9 @@
         <!-- Universal Exercise Template -->
         <div id="exerciseTemplate" class="screen exercise-screen hidden">
             <h2 id="exerciseTitle">Exercise Title</h2>
-            <p class="exercise-title" id="exerciseSubtitle">Practice changing subjects while keeping the same verb</p>
+            <p class="exercise-title" id="exerciseSubtitle">Next - поменять подлежащее<br>
+            Change the Word - поменять глагол<br>
+            Клик на примерах, чтобы скрыть всё, кроме утверждения</p>
             
             <div class="verb-info" id="currentVerbInfo">Current verb: go</div>
             <button class="rules-button" onclick="app.showRules()">📚 Rules</button>
@@ -597,21 +616,26 @@
 
             <div class="navigation-buttons">
                 <div class="button-row">
-                    <button class="nav-button" onclick="app.previousSubject()">Back</button>
-                    <button class="nav-button next-button" onclick="app.nextSubject()">Next</button>
+                    <button class="nav-button" onclick="app.previousSubject()">◀ Back</button>
+                    <button class="nav-button next-button" onclick="app.nextSubject()">Next ▶</button>
                 </div>
                 <div class="button-row">
                     <button class="nav-button" onclick="app.playAudio()">🔊 Play</button>
                     <button class="nav-button" onclick="app.changeVerb()">Change the Word</button>
                 </div>
-                <button class="back-button" id="exerciseBackButton" onclick="app.goBack()">Back</button>
+                <button class="back-button" id="exerciseBackButton" onclick="app.goBack()">Tenses</button>
             </div>
         </div>
 
         <!-- Test Yourself -->
         <div id="testYourself" class="screen hidden">
             <h2>Test Yourself</h2>
-            <p class="exercise-title">Form the positive statement, negative, question and wh-question using the given subject, verb and tense. Click to check your answer.</p>
+            <p class="exercise-title" id="testInstructions" onclick="app.toggleInstructions()" style="cursor: pointer;" title="Click to toggle instructions">Составь в заданном времени:<br>
+            - Утверждение<br>
+            - Отрицание<br>
+            - Вопрос<br>
+            - Wh-вопрос<br>
+            Клик, чтобы проверить себя</p>
             
             <div class="exercise-container" id="testContainer" onclick="app.revealNext()">
                 <div class="test-item">
@@ -627,7 +651,7 @@
             
             <div class="navigation-buttons">
                 <button class="nav-button" onclick="app.generateNewTest()">New Example</button>
-                <button class="back-button" onclick="app.showMainMenu()">Back to Main Menu</button>
+                <button class="back-button" onclick="app.showMainMenu()">Main Menu</button>
             </div>
         </div>
     </div>
@@ -647,6 +671,7 @@
             // Test state
             revealStage: 0,
             currentTestData: null,
+            instructionsCollapsed: false,
             
             // Navigation history for back button
             navigationHistory: [],
@@ -717,6 +742,16 @@
             showTestYourself() {
                 this.navigationHistory.push('testYourself');
                 this.showScreen('testYourself');
+                this.instructionsCollapsed = false;
+                const instructions = document.getElementById('testInstructions');
+                if (instructions) {
+                    instructions.innerHTML = `Составь в заданном времени:<br>
+                    - Утверждение<br>
+                    - Отрицание<br>
+                    - Вопрос<br>
+                    - Wh-вопрос<br>
+                    Клик, чтобы проверить себя`;
+                }
                 this.generateNewTest();
             },
             
@@ -995,6 +1030,23 @@
                     
                     if (this.revealStage === elements.length) {
                         document.getElementById('testContainer').classList.add('complete');
+                    }
+                }
+            },
+            
+            toggleInstructions() {
+                const instructions = document.getElementById('testInstructions');
+                if (instructions) {
+                    this.instructionsCollapsed = !this.instructionsCollapsed;
+                    if (this.instructionsCollapsed) {
+                        instructions.innerHTML = 'Instructions ▼';
+                    } else {
+                        instructions.innerHTML = `Составь в заданном времени:<br>
+                        - Утверждение<br>
+                        - Отрицание<br>
+                        - Вопрос<br>
+                        - Wh-вопрос<br>
+                        Клик, чтобы проверить себя`;
                     }
                 }
             }
@@ -1506,20 +1558,110 @@
             // Helper: Get wh-question word
             getWhQuestionWord(verb, tense) {
                 const whWords = {
-                    'go': 'Where', 'come': 'Where', 'live': 'Where', 'work': 'Where',
-                    'do': 'What', 'make': 'What', 'eat': 'What', 'drink': 'What',
-                    'buy': 'What', 'see': 'What', 'read': 'What', 'write': 'What',
-                    'say': 'What', 'think': 'What', 'know': 'What', 'want': 'What',
-                    'like': 'What', 'have': 'What', 'get': 'What', 'take': 'What',
-                    'give': 'What', 'find': 'What', 'lose': 'What', 'play': 'What',
-                    'watch': 'What', 'hear': 'What', 'feel': 'How', 'look': 'How',
-                    'meet': 'Who', 'call': 'Who', 'help': 'Who', 'teach': 'Who',
-                    'tell': 'Who', 'ask': 'Who', 'wait': 'Who', 'love': 'Who',
-                    'start': 'When', 'finish': 'When', 'begin': 'When', 'end': 'When',
-                    'leave': 'When', 'arrive': 'When', 'cost': 'How much',
-                    'be': 'Who'
+                    // Movement/location verbs
+                    'go': 'Where', 
+                    'come': 'Where', 
+                    'run': 'Where',
+                    'walk': 'Where',
+                    'fly': 'Where',
+                    'drive': 'Where',
+                    'swim': 'Where',
+                    'leave': 'Where',
+                    'stand': 'Where',
+                    'sit': 'Where',
+                    'lie': 'Where',
+                    'fall': 'Where',
+                    'put': 'Where',
+                    'sleep': 'Where',
+                    
+                    // Action/object verbs
+                    'do': 'What',
+                    'make': 'What',
+                    'build': 'What',
+                    'create': 'What',
+                    'draw': 'What',
+                    'write': 'What',
+                    'cook': 'What',
+                    'eat': 'What',
+                    'drink': 'What',
+                    'buy': 'What',
+                    'sell': 'What',
+                    'bring': 'What',
+                    'take': 'What',
+                    'give': 'What',
+                    'get': 'What',
+                    'find': 'What',
+                    'lose': 'What',
+                    'break': 'What',
+                    'fix': 'What',
+                    'choose': 'What',
+                    'have': 'What',
+                    'see': 'What',
+                    'hear': 'What',
+                    'read': 'What',
+                    'say': 'What',
+                    'tell': 'What',
+                    'show': 'What',
+                    'throw': 'What',
+                    'catch': 'What',
+                    'seek': 'What',
+                    'sing': 'What',
+                    'play': 'What',
+                    
+                    // Communication verbs
+                    'speak': 'What language',
+                    'talk': 'What...about',
+                    'think': 'What...about',
+                    'dream': 'What...about',
+                    
+                    // Feeling/state verbs
+                    'feel': 'How',
+                    'seem': 'How',
+                    'appear': 'How',
+                    'look': 'How',
+                    'sound': 'How',
+                    'grow': 'How fast',
+                    
+                    // Person-oriented verbs
+                    'meet': 'Who',
+                    'beat': 'Who',
+                    'teach': 'What',  // teach something, not who
+                    'help': 'Who',
+                    'call': 'Who',
+                    'ask': 'Who',
+                    'wait': 'Who...for',
+                    'love': 'Who',
+                    
+                    // Knowledge/understanding verbs
+                    'know': 'What',  // know something
+                    'understand': 'What',  // understand something
+                    'tell': 'What',  // tell something
+                    
+                    // Time-based verbs
+                    'start': 'When',
+                    'begin': 'When',
+                    'finish': 'When',
+                    'end': 'When',
+                    'arrive': 'When',
+                    
+                    // Cost/value verbs
+                    'cost': 'How much',
+                    'pay': 'How much',
+                    
+                    // Work/activity verbs
+                    'work': 'Where',
+                    'study': 'What',
+                    'learn': 'What',
+                    
+                    // Emotion verbs
+                    'cry': 'Why',
+                    
+                    // Special cases
+                    'be': 'Who',
+                    'become': 'What'
                 };
                 
+                // For continuous tenses with duration focus
                 if (tense && tense.includes('PerfectContinuous')) {
                     return 'How long';
                 }
@@ -1533,9 +1675,20 @@
                     return `What ${auxPattern} ${verb}?`;
                 }
                 
+                // Special handling for verbs that need prepositions
                 if (whWord.includes('...')) {
                     const parts = whWord.split('...');
-                    return `${parts[0]} ${auxPattern} ${verb} ${parts[1]}?`;
+                    const whPart = parts[0];
+                    const prepPart = parts[1];
+                    
+                    // For verbs like "talk about", "think about", "wait for"
+                    if (prepPart === 'about') {
+                        return `${whPart} ${auxPattern} ${verb} about?`;
+                    } else if (prepPart === 'for') {
+                        return `${whPart} ${auxPattern} ${verb} for?`;
+                    }
+                    
+                    return `${whPart} ${auxPattern} ${verb} ${prepPart}?`;
                 }
                 
                 return `${whWord} ${auxPattern} ${verb}?`;
