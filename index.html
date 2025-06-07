@@ -172,6 +172,62 @@
             opacity: 1;
         }
 
+        .article-exercise-container {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .article-exercise-container:hover {
+            background: #edf2f7;
+        }
+        
+        .article-exercise-container::after {
+            content: 'Клик, чтобы увидеть ответ';
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 12px;
+            color: #a0aec0;
+            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        #avstheContainer::after {
+            content: 'Клик, чтобы увидеть второе предложение';
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 12px;
+            color: #a0aec0;
+            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        #avstheContainer.answered::after {
+            content: 'Сравните использование артиклей';
+            color: #48bb78;
+        }
+        
+        .article-exercise-container:hover::after {
+            opacity: 1;
+        }
+
+        .article-exercise-container.answered::after {
+            content: 'Ответ показан';
+            color: #48bb78;
+        }
+
         .sentence {
             font-size: 20px;
             color: #2d3748;
@@ -188,6 +244,28 @@
             transform: translateX(5px);
         }
 
+        .article-sentence {
+            font-size: 22px;
+            color: #2d3748;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            padding: 20px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .article-sentence.task {
+            border-color: #4299e1;
+            background: #ebf8ff;
+        }
+
+        .article-sentence.answer {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
         .exercise-title {
             font-size: 16px;
             color: #718096;
@@ -197,7 +275,8 @@
         }
         
         #testInstructions:hover,
-        #exerciseSubtitle:hover {
+        #exerciseSubtitle:hover,
+        #articleInstructions:hover {
             text-decoration: underline;
             color: #4a5568;
         }
@@ -213,6 +292,17 @@
             margin-bottom: 15px;
             font-weight: bold;
             color: #2c5282;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .article-info {
+            background: #c6f6d5;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #22543d;
             line-height: 1.6;
             text-align: center;
         }
@@ -569,6 +659,8 @@
             <h2>Choose Category</h2>
             <button class="category-button" onclick="app.showSimpleMenu()">Simple Tenses</button>
             <button class="category-button" onclick="app.showContinuousMenu()">Continuous Tenses</button>
+            <button class="category-button" onclick="app.startArticleExercise()">Articles (A/An)</button>
+            <button class="category-button" onclick="app.startAvsTheExercise()">Articles (A vs The)</button>
             <button class="back-button" onclick="app.showMainMenu()">Back to Main Menu</button>
         </div>
         
@@ -628,6 +720,56 @@
             </div>
         </div>
 
+        <!-- A vs The Exercise -->
+        <div id="avstheExercise" class="screen exercise-screen hidden">
+            <h2>Articles (A vs The)</h2>
+            <p class="exercise-title" id="avstheInstructions" onclick="app.toggleAvsTheInstructions()" style="cursor: pointer;" title="Click to toggle instructions">Сравните использование "a" и "the"<br>
+            Клик на примере для просмотра второго предложения<br>
+            Клик на инструкции, чтобы её скрыть<br>
+            Next - новый пример</p>
+            
+            <div class="article-info hidden" id="currentAvsTheInfo"></div>
+            <button class="rules-button" onclick="app.showAvsTheRules()">📚 A vs The Rules</button>
+            
+            <div class="article-exercise-container" id="avstheContainer" onclick="app.revealTheExample()">
+                <div class="article-sentence task" id="aExample">Loading...</div>
+                <div class="article-sentence answer hidden" id="theExample">Loading...</div>
+            </div>
+
+            <div id="avstheErrorMessage" class="error-message hidden"></div>
+
+            <div class="navigation-buttons">
+                <button class="nav-button next-button" onclick="app.nextAvsTheExample()">Next Example ▶</button>
+                <button class="nav-button" onclick="app.playAvsTheAudio()">🔊 Play</button>
+                <button class="back-button" onclick="app.showExercises()">Back to Categories</button>
+            </div>
+        </div>
+
+        <!-- Article Exercise -->
+        <div id="articleExercise" class="screen exercise-screen hidden">
+            <h2>Articles (A/An)</h2>
+            <p class="exercise-title" id="articleInstructions" onclick="app.toggleArticleInstructions()" style="cursor: pointer;" title="Click to toggle instructions">Решите, нужен ли артикль "a", "an"<br>
+            Клик на примере для просмотра ответа<br>
+            Клик на инструкции, чтобы её скрыть<br>
+            Next - новый пример</p>
+            
+            <div class="article-info hidden" id="currentArticleInfo"></div>
+            <button class="rules-button" onclick="app.showArticleRules()">📚 A/An Rules</button>
+            
+            <div class="article-exercise-container" id="articleContainer" onclick="app.revealArticleAnswer()">
+                <div class="article-sentence task" id="articleTask">Loading...</div>
+                <div class="article-sentence answer hidden" id="articleAnswer">Loading...</div>
+            </div>
+
+            <div id="articleErrorMessage" class="error-message hidden"></div>
+
+            <div class="navigation-buttons">
+                <button class="nav-button next-button" onclick="app.nextArticleExample()">Next Example ▶</button>
+                <button class="nav-button" onclick="app.playArticleAudio()">🔊 Play</button>
+                <button class="back-button" onclick="app.showExercises()">Back to Categories</button>
+            </div>
+        </div>
+
         <!-- Test Yourself -->
         <div id="testYourself" class="screen hidden">
             <h2>Test Yourself</h2>
@@ -669,6 +811,18 @@
             currentRulesLanguage: 'russian',
             examplesHidden: false,
             
+            // Article exercise state
+            currentArticleIndex: 0,
+            articleAnswerRevealed: false,
+            articleInstructionsCollapsed: false,
+            availableArticleIndices: [],
+            
+            // A vs The exercise state
+            currentAvsTheIndex: 0,
+            avstheAnswerRevealed: false,
+            avstheInstructionsCollapsed: false,
+            availableAvsTheIndices: [],
+            
             // Test state
             revealStage: 0,
             currentTestData: null,
@@ -681,6 +835,293 @@
             // Initialize
             init() {
                 this.showScreen('welcomeScreen');
+            },
+            
+            // Article Exercise Functions
+            startArticleExercise() {
+                // Initialize available indices for no-repeat system
+                this.availableArticleIndices = Array.from({length: data.articleTaskSentences.length}, (_, i) => i);
+                this.currentArticleIndex = this.getNextArticleIndex();
+                this.articleAnswerRevealed = false;
+                this.articleInstructionsCollapsed = false;
+                
+                // Reset instructions
+                const instructions = document.getElementById('articleInstructions');
+                if (instructions) {
+                    instructions.innerHTML = `Решите, нужен ли артикль "a", "an"<br>
+                    Клик на примере для просмотра ответа<br>
+                    Клик на инструкции, чтобы её скрыть<br>
+                    Next - новый пример`;
+                }
+                
+                this.navigationHistory.push('articleExercise');
+                this.showScreen('articleExercise');
+                this.updateArticleDisplay();
+            },
+            
+            getNextArticleIndex() {
+                // If no more available indices, reset the array
+                if (this.availableArticleIndices.length === 0) {
+                    this.availableArticleIndices = Array.from({length: data.articleTaskSentences.length}, (_, i) => i);
+                }
+                
+                // Pick a random index from available ones
+                const randomPosition = Math.floor(Math.random() * this.availableArticleIndices.length);
+                const selectedIndex = this.availableArticleIndices[randomPosition];
+                
+                // Remove the selected index from available ones
+                this.availableArticleIndices.splice(randomPosition, 1);
+                
+                return selectedIndex;
+            },
+            
+            updateArticleDisplay() {
+                const taskSentence = data.articleTaskSentences[this.currentArticleIndex];
+                const answerSentence = data.articleAnswerSentences[this.currentArticleIndex];
+                
+                document.getElementById('articleTask').textContent = taskSentence;
+                document.getElementById('articleAnswer').innerHTML = answerSentence;
+                
+                // Reset state
+                this.articleAnswerRevealed = false;
+                document.getElementById('articleTask').style.display = 'block';
+                document.getElementById('articleAnswer').style.display = 'none';
+                document.getElementById('articleAnswer').classList.add('hidden');
+                document.getElementById('articleContainer').classList.remove('answered');
+            },
+            
+            revealArticleAnswer() {
+                if (!this.articleAnswerRevealed) {
+                    this.articleAnswerRevealed = true;
+                    document.getElementById('articleTask').style.display = 'none';
+                    document.getElementById('articleAnswer').style.display = 'block';
+                    document.getElementById('articleAnswer').classList.remove('hidden');
+                    document.getElementById('articleContainer').classList.add('answered');
+                }
+            },
+            
+            nextArticleExample() {
+                this.currentArticleIndex = this.getNextArticleIndex();
+                this.updateArticleDisplay();
+            },
+            
+            playArticleAudio() {
+                const currentSentence = this.articleAnswerRevealed ? 
+                    document.getElementById('articleAnswer').textContent : 
+                    document.getElementById('articleTask').textContent;
+                
+                // Remove bold formatting for speech
+                const cleanSentence = currentSentence.replace(/\*\*/g, '');
+                this.speak(cleanSentence);
+            },
+            
+            showArticleRules() {
+                const modalOverlay = document.createElement('div');
+                modalOverlay.className = 'modal-overlay';
+                modalOverlay.id = 'articleRulesModal';
+                modalOverlay.onclick = (e) => {
+                    if (e.target === modalOverlay) {
+                        this.closeArticleRules();
+                    }
+                };
+                
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                
+                const closeButton = document.createElement('button');
+                closeButton.className = 'modal-close';
+                closeButton.innerHTML = '×';
+                closeButton.onclick = () => this.closeArticleRules();
+                
+                const title = document.createElement('h3');
+                title.className = 'modal-title';
+                title.textContent = 'Articles A/An Rules';
+                
+                const description = document.createElement('div');
+                description.className = 'modal-description';
+                description.id = 'articleRulesDescription';
+                description.textContent = data.articleRules[this.currentRulesLanguage];
+                description.onclick = () => this.toggleArticleRulesLanguage();
+                
+                modalContent.appendChild(closeButton);
+                modalContent.appendChild(title);
+                modalContent.appendChild(description);
+                modalOverlay.appendChild(modalContent);
+                
+                document.body.appendChild(modalOverlay);
+                this.currentRulesLanguage = 'russian';
+            },
+            
+            closeArticleRules() {
+                const modal = document.getElementById('articleRulesModal');
+                if (modal) modal.remove();
+            },
+            
+            toggleArticleRulesLanguage() {
+                this.currentRulesLanguage = 
+                    this.currentRulesLanguage === 'russian' ? 'english' : 'russian';
+                const description = document.getElementById('articleRulesDescription');
+                if (description) {
+                    description.textContent = data.articleRules[this.currentRulesLanguage];
+                }
+            },
+            
+            toggleArticleInstructions() {
+                const instructions = document.getElementById('articleInstructions');
+                if (instructions) {
+                    this.articleInstructionsCollapsed = !this.articleInstructionsCollapsed;
+                    if (this.articleInstructionsCollapsed) {
+                        instructions.innerHTML = 'Instructions ▼';
+                    } else {
+                        instructions.innerHTML = `Решите, нужен ли артикль "a", "an"<br>
+                        Клик на примере для просмотра ответа<br>
+                        Клик на инструкции, чтобы её скрыть<br>
+                        Next - новый пример`;
+                    }
+                }
+            },
+            
+            // A vs The Exercise Functions
+            startAvsTheExercise() {
+                // Initialize available indices for no-repeat system
+                this.availableAvsTheIndices = Array.from({length: data.avstheExamples.length}, (_, i) => i);
+                this.currentAvsTheIndex = this.getNextAvsTheIndex();
+                this.avstheAnswerRevealed = false;
+                this.avstheInstructionsCollapsed = false;
+                
+                // Reset instructions
+                const instructions = document.getElementById('avstheInstructions');
+                if (instructions) {
+                    instructions.innerHTML = `Сравните использование "a" и "the"<br>
+                    Клик на примере для просмотра второго предложения<br>
+                    Клик на инструкции, чтобы её скрыть<br>
+                    Next - новый пример`;
+                }
+                
+                this.navigationHistory.push('avstheExercise');
+                this.showScreen('avstheExercise');
+                this.updateAvsTheDisplay();
+            },
+            
+            getNextAvsTheIndex() {
+                // If no more available indices, reset the array
+                if (this.availableAvsTheIndices.length === 0) {
+                    this.availableAvsTheIndices = Array.from({length: data.avstheExamples.length}, (_, i) => i);
+                }
+                
+                // Pick a random index from available ones
+                const randomPosition = Math.floor(Math.random() * this.availableAvsTheIndices.length);
+                const selectedIndex = this.availableAvsTheIndices[randomPosition];
+                
+                // Remove the selected index from available ones
+                this.availableAvsTheIndices.splice(randomPosition, 1);
+                
+                return selectedIndex;
+            },
+            
+            updateAvsTheDisplay() {
+                const example = data.avstheExamples[this.currentAvsTheIndex];
+                
+                document.getElementById('aExample').innerHTML = example.aExample;
+                document.getElementById('theExample').innerHTML = example.theExample;
+                
+                // Reset state
+                this.avstheAnswerRevealed = false;
+                document.getElementById('aExample').style.display = 'block';
+                document.getElementById('theExample').style.display = 'none';
+                document.getElementById('theExample').classList.add('hidden');
+                document.getElementById('avstheContainer').classList.remove('answered');
+            },
+            
+            revealTheExample() {
+                if (!this.avstheAnswerRevealed) {
+                    this.avstheAnswerRevealed = true;
+                    document.getElementById('aExample').style.display = 'none';
+                    document.getElementById('theExample').style.display = 'block';
+                    document.getElementById('theExample').classList.remove('hidden');
+                    document.getElementById('avstheContainer').classList.add('answered');
+                }
+            },
+            
+            nextAvsTheExample() {
+                this.currentAvsTheIndex = this.getNextAvsTheIndex();
+                this.updateAvsTheDisplay();
+            },
+            
+            playAvsTheAudio() {
+                const currentSentence = this.avstheAnswerRevealed ? 
+                    document.getElementById('theExample').textContent : 
+                    document.getElementById('aExample').textContent;
+                
+                // Remove bold formatting for speech
+                const cleanSentence = currentSentence.replace(/\*\*/g, '');
+                this.speak(cleanSentence);
+            },
+            
+            showAvsTheRules() {
+                const modalOverlay = document.createElement('div');
+                modalOverlay.className = 'modal-overlay';
+                modalOverlay.id = 'avstheRulesModal';
+                modalOverlay.onclick = (e) => {
+                    if (e.target === modalOverlay) {
+                        this.closeAvsTheRules();
+                    }
+                };
+                
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                
+                const closeButton = document.createElement('button');
+                closeButton.className = 'modal-close';
+                closeButton.innerHTML = '×';
+                closeButton.onclick = () => this.closeAvsTheRules();
+                
+                const title = document.createElement('h3');
+                title.className = 'modal-title';
+                title.textContent = 'A vs The Rules';
+                
+                const description = document.createElement('div');
+                description.className = 'modal-description';
+                description.id = 'avstheRulesDescription';
+                description.textContent = data.avstheRules[this.currentRulesLanguage];
+                description.onclick = () => this.toggleAvsTheRulesLanguage();
+                
+                modalContent.appendChild(closeButton);
+                modalContent.appendChild(title);
+                modalContent.appendChild(description);
+                modalOverlay.appendChild(modalContent);
+                
+                document.body.appendChild(modalOverlay);
+                this.currentRulesLanguage = 'russian';
+            },
+            
+            closeAvsTheRules() {
+                const modal = document.getElementById('avstheRulesModal');
+                if (modal) modal.remove();
+            },
+            
+            toggleAvsTheRulesLanguage() {
+                this.currentRulesLanguage = 
+                    this.currentRulesLanguage === 'russian' ? 'english' : 'russian';
+                const description = document.getElementById('avstheRulesDescription');
+                if (description) {
+                    description.textContent = data.avstheRules[this.currentRulesLanguage];
+                }
+            },
+            
+            toggleAvsTheInstructions() {
+                const instructions = document.getElementById('avstheInstructions');
+                if (instructions) {
+                    this.avstheInstructionsCollapsed = !this.avstheInstructionsCollapsed;
+                    if (this.avstheInstructionsCollapsed) {
+                        instructions.innerHTML = 'Instructions ▼';
+                    } else {
+                        instructions.innerHTML = `Сравните использование "a" и "the"<br>
+                        Клик на примере для просмотра второго предложения<br>
+                        Клик на инструкции, чтобы её скрыть<br>
+                        Next - новый пример`;
+                    }
+                }
             },
             
             // Toggle examples visibility
@@ -776,7 +1217,10 @@
                 this.examplesHidden = false;
                 const sentences = ['sentence2', 'sentence3', 'sentence4'];
                 sentences.forEach(id => {
-                    document.getElementById(id).style.display = 'block';
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.style.display = 'block';
+                    }
                 });
                 
                 // Reset instructions to expanded
@@ -1080,6 +1524,229 @@
 
         // Data Module
         const data = {
+            // A vs The exercise data
+            avstheExamples: [
+                {
+                    aExample: "I bought <strong>a car</strong> yesterday.",
+                    theExample: "<strong>The car</strong> is red and very fast."
+                },
+                {
+                    aExample: "There's <strong>a cat</strong> in the garden.",
+                    theExample: "<strong>The cat</strong> is sleeping under the tree."
+                },
+                {
+                    aExample: "We need <strong>a teacher</strong> for this class.",
+                    theExample: "<strong>The teacher</strong> should be experienced."
+                },
+                {
+                    aExample: "I found <strong>a book</strong> on the floor.",
+                    theExample: "<strong>The book</strong> belongs to Sarah."
+                },
+                {
+                    aExample: "She ordered <strong>a pizza</strong> for dinner.",
+                    theExample: "<strong>The pizza</strong> arrived in 30 minutes."
+                },
+                {
+                    aExample: "He's looking for <strong>a job</strong>.",
+                    theExample: "<strong>The job</strong> he wants is at Google."
+                },
+                {
+                    aExample: "I heard <strong>a noise</strong> upstairs.",
+                    theExample: "<strong>The noise</strong> was coming from the attic."
+                },
+                {
+                    aExample: "They bought <strong>a house</strong> last month.",
+                    theExample: "<strong>The house</strong> has a beautiful garden."
+                },
+                {
+                    aExample: "I need <strong>a pen</strong> to write.",
+                    theExample: "<strong>The pen</strong> on your desk is mine."
+                },
+                {
+                    aExample: "She met <strong>a man</strong> at the conference.",
+                    theExample: "<strong>The man</strong> was a famous scientist."
+                },
+                {
+                    aExample: "We saw <strong>a movie</strong> last night.",
+                    theExample: "<strong>The movie</strong> was really exciting."
+                },
+                {
+                    aExample: "He's wearing <strong>a jacket</strong> today.",
+                    theExample: "<strong>The jacket</strong> looks expensive."
+                },
+                {
+                    aExample: "I need <strong>a computer</strong> for work.",
+                    theExample: "<strong>The computer</strong> I want costs $2000."
+                },
+                {
+                    aExample: "She's reading <strong>a newspaper</strong>.",
+                    theExample: "<strong>The newspaper</strong> has interesting articles."
+                },
+                {
+                    aExample: "We visited <strong>a museum</strong> yesterday.",
+                    theExample: "<strong>The museum</strong> was closed on Mondays."
+                },
+                {
+                    aExample: "He drives <strong>a truck</strong> for work.",
+                    theExample: "<strong>The truck</strong> is very old but reliable."
+                },
+                {
+                    aExample: "I saw <strong>a bird</strong> in the sky.",
+                    theExample: "<strong>The bird</strong> was flying south."
+                },
+                {
+                    aExample: "She found <strong>a wallet</strong> on the street.",
+                    theExample: "<strong>The wallet</strong> contained $50."
+                },
+                {
+                    aExample: "We need <strong>a solution</strong> to this problem.",
+                    theExample: "<strong>The solution</strong> you suggested won't work."
+                },
+                {
+                    aExample: "He's learning <strong>a language</strong>.",
+                    theExample: "<strong>The language</strong> he's studying is Chinese."
+                },
+                {
+                    aExample: "I bought <strong>a phone</strong> today.",
+                    theExample: "<strong>The phone</strong> has an excellent camera."
+                },
+                {
+                    aExample: "She's writing <strong>a letter</strong>.",
+                    theExample: "<strong>The letter</strong> is for her grandmother."
+                },
+                {
+                    aExample: "We're planning <strong>a trip</strong>.",
+                    theExample: "<strong>The trip</strong> will be to Europe."
+                },
+                {
+                    aExample: "He opened <strong>a restaurant</strong>.",
+                    theExample: "<strong>The restaurant</strong> serves Italian food."
+                },
+                {
+                    aExample: "I heard <strong>a song</strong> on the radio.",
+                    theExample: "<strong>The song</strong> was by my favorite band."
+                }
+            ],
+            
+            // A vs The rules
+            avstheRules: {
+                english: "Use 'a/an' (indefinite article) when introducing something new, unknown, or any one of many. Use 'the' (definite article) when referring to something specific, already mentioned, known to both speaker and listener, or unique. For example: 'I bought a car' (any car, first mention) → 'The car is red' (that specific car we just mentioned).",
+                russian: "Используйте 'a/an' (неопределенный артикль) при первом упоминании, когда говорите о чем-то новом, неизвестном или любом из многих. Используйте 'the' (определенный артикль) при ссылке на что-то конкретное, уже упомянутое, известное обеим сторонам или единственное в своем роде. Например: 'I bought a car' (любая машина, первое упоминание) → 'The car is red' (та конкретная машина, о которой мы только что говорили)."
+            },
+            
+            // Article exercise data
+            articleTaskSentences: [
+                "I need (pen).",
+                "She bought (apple).",
+                "(Dogs) are loyal (animals).",
+                "He is reading (book).",
+                "(Water) is essential for (life).",
+                "We saw (elephant) at the zoo.",
+                "(Students) work hard.",
+                "I want (sandwich) for lunch.",
+                "(Music) helps me relax.",
+                "She's (engineer).",
+                "(Books) are expensive.",
+                "There's (chair) in the corner.",
+                "(Love) is important.",
+                "He drives (truck).",
+                "(Children) like (candy).",
+                "I have (idea).",
+                "(Coffee) tastes good.",
+                "We need (umbrella).",
+                "(Cars) need (fuel).",
+                "She found (key) on the floor.",
+                "It takes (hour) to drive there.",
+                "(Teachers) help (students).",
+                "He's (honest man).",
+                "(Freedom) has (value).",
+                "She attends (university).",
+                "(Birds) can fly.",
+                "I ate (orange) for breakfast.",
+                "(Money) can't buy (happiness).",
+                "He wore (uniform).",
+                "(Flowers) smell nice.",
+                "She's (doctor).",
+                "(Information) was limited.",
+                "We heard (interesting story).",
+                "(Rice) is popular in (Asia).",
+                "That's (useful tool).",
+                "(Computers) are helpful.",
+                "He's (architect).",
+                "(Advice) is valuable.",
+                "She wore (orange dress).",
+                "(Tuesday) is my favorite (day).",
+                "It's (European car).",
+                "(Scientists) study (nature).",
+                "I'm (teacher).",
+                "(Knowledge) is (power).",
+                "She has (unique style).",
+                "(London) is beautiful.",
+                "He's (accountant).",
+                "(Happiness) comes from within.",
+                "It's (one-way street).",
+                "(Mozart) was (composer)."
+            ],
+            
+            articleAnswerSentences: [
+                "I need <strong>a pen</strong>.",
+                "She bought <strong>an apple</strong>.",
+                "<strong>Dogs</strong> are loyal <strong>animals</strong>.",
+                "He is reading <strong>a book</strong>.",
+                "<strong>Water</strong> is essential for <strong>life</strong>.",
+                "We saw <strong>an elephant</strong> at the zoo.",
+                "<strong>Students</strong> work hard.",
+                "I want <strong>a sandwich</strong> for lunch.",
+                "<strong>Music</strong> helps me relax.",
+                "She's <strong>an engineer</strong>.",
+                "<strong>Books</strong> are expensive.",
+                "There's <strong>a chair</strong> in the corner.",
+                "<strong>Love</strong> is important.",
+                "He drives <strong>a truck</strong>.",
+                "<strong>Children</strong> like <strong>candy</strong>.",
+                "I have <strong>an idea</strong>.",
+                "<strong>Coffee</strong> tastes good.",
+                "We need <strong>an umbrella</strong>.",
+                "<strong>Cars</strong> need <strong>fuel</strong>.",
+                "She found <strong>a key</strong> on the floor.",
+                "It takes <strong>an hour</strong> to drive there.",
+                "<strong>Teachers</strong> help <strong>students</strong>.",
+                "He's <strong>an honest man</strong>.",
+                "<strong>Freedom</strong> has <strong>value</strong>.",
+                "She attends <strong>a university</strong>.",
+                "<strong>Birds</strong> can fly.",
+                "I ate <strong>an orange</strong> for breakfast.",
+                "<strong>Money</strong> can't buy <strong>happiness</strong>.",
+                "He wore <strong>a uniform</strong>.",
+                "<strong>Flowers</strong> smell nice.",
+                "She's <strong>a doctor</strong>.",
+                "<strong>Information</strong> was limited.",
+                "We heard <strong>an interesting story</strong>.",
+                "<strong>Rice</strong> is popular in <strong>Asia</strong>.",
+                "That's <strong>a useful tool</strong>.",
+                "<strong>Computers</strong> are helpful.",
+                "He's <strong>an architect</strong>.",
+                "<strong>Advice</strong> is valuable.",
+                "She wore <strong>an orange dress</strong>.",
+                "<strong>Tuesday</strong> is my favorite <strong>day</strong>.",
+                "It's <strong>a European car</strong>.",
+                "<strong>Scientists</strong> study <strong>nature</strong>.",
+                "I'm <strong>a teacher</strong>.",
+                "<strong>Knowledge</strong> is <strong>power</strong>.",
+                "She has <strong>a unique style</strong>.",
+                "<strong>London</strong> is beautiful.",
+                "He's <strong>an accountant</strong>.",
+                "<strong>Happiness</strong> comes from within.",
+                "It's <strong>a one-way street</strong>.",
+                "<strong>Mozart</strong> was <strong>a composer</strong>."
+            ],
+            
+            // Article rules
+            articleRules: {
+                english: "Use 'a' before words that start with consonant sounds (a book, a university - 'you' sound). Use 'an' before words that start with vowel sounds (an apple, an hour - silent 'h'). Don't use articles with plural nouns when speaking generally (cats are animals), uncountable nouns (water, music), proper nouns (London, Mozart), or abstract concepts (love, happiness).",
+                russian: "Используйте 'a' перед словами, начинающимися с согласного звука (a book, a university - звук 'ю'). Используйте 'an' перед словами, начинающимися с гласного звука (an apple, an hour - 'h' немое). Не используйте артикли с множественным числом при обобщении (cats are animals), неисчисляемыми существительными (water, music), именами собственными (London, Mozart) или абстрактными понятиями (love, happiness)."
+            },
+            
             // Tense configuration
             tenseConfig: {
                 'present': { name: 'Present Simple', class: 'present' },
