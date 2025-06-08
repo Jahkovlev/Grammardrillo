@@ -585,6 +585,24 @@
         .exercise-screen {
             /* Common styling for all exercise screens */
         }
+
+        /* Audio status indicator */
+        .audio-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #48bb78;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            z-index: 1000;
+            opacity: 0.8;
+        }
+
+        .audio-status.disabled {
+            background: #f56565;
+        }
         
         @media (max-width: 480px) {
             .container {
@@ -638,6 +656,9 @@
     </style>
 </head>
 <body>
+    <!-- Audio status indicator -->
+    <div id="audioStatus" class="audio-status">🔊 Audio Ready</div>
+
     <div class="container">
         <!-- Welcome Screen -->
         <div id="welcomeScreen" class="screen">
@@ -811,6 +832,11 @@
             currentRulesLanguage: 'russian',
             examplesHidden: false,
             
+            // Audio state
+            audioInitialized: false,
+            speechAvailable: false,
+            isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+            
             // Article exercise state
             currentArticleIndex: 0,
             articleAnswerRevealed: false,
@@ -834,9 +860,186 @@
             
             // Initialize
             init() {
+                this.initializeAudio();
                 this.showScreen('welcomeScreen');
             },
-            
+
+            // Initialize audio system with mobile fixes
+            initializeAudio() {
+                this.speechAvailable = 'speechSynthesis' in window;
+                
+                if (!this.speechAvailable) {
+                    this.updateAudioStatus('❌ Audio Not Available', true);
+                    return;
+                }
+
+                // Initialize speech synthesis on first user interaction
+                document.addEventListener('click', this.enableAudioOnFirstClick.bind(this), { once: true });
+                document.addEventListener('touchstart', this.enableAudioOnFirstClick.bind(this), { once: true });
+
+                // Handle voices loaded event
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = this.onVoicesChanged.bind(this);
+                }
+
+                // Check if voices are already loaded
+                setTimeout(() => {
+                    if (speechSynthesis.getVoices().length > 0) {
+                        this.onVoicesChanged();
+                    }
+                }, 100);
+
+                this.updateAudioStatus('🔊 Touch to Enable Audio', false);
+            },
+
+            // Enable audio on first user interaction (required for mobile)
+            enableAudioOnFirstClick() {
+                if (!this.audioInitialized && this.speechAvailable) {
+                    // Create a silent utterance to initialize the speech synthesis
+                    const utterance = new SpeechSynthesisUtterance('');
+                    utterance.volume = 0;
+                    utterance.rate = 1;
+                    
+                    // Handle successful initialization
+                    utterance.onstart = () => {
+                        this.audioInitialized = true;
+                        this.updateAudioStatus('🔊 Audio Ready', false);
+                        console.log('Audio initialized successfully');
+                    };
+
+                    // Handle initialization failure
+                    utterance.onerror = (event) => {
+                        console.log('Audio initialization failed:', event.error);
+                        this.updateAudioStatus('⚠️ Audio Limited', true);
+                    };
+
+                    try {
+                        speechSynthesis.speak(utterance);
+                    } catch (error) {
+                        console.log('Speech synthesis error:', error);
+                        this.updateAudioStatus('❌ Audio Error', true);
+                    }
+                }
+            },
+
+            // Handle voices loaded
+            onVoicesChanged() {
+                const voices = speechSynthesis.getVoices();
+                const englishVoices = voices.filter(voice => voice.lang.startsWith('en'));
+                
+                if (englishVoices.length > 0) {
+                    this.audioEnabled = true;
+                    if (this.audioInitialized) {
+                        this.updateAudioStatus('🔊 Audio Ready', false);
+                    }
+                } else {
+                    this.updateAudioStatus('⚠️ No English Voices', true);
+                }
+            },
+
+            // Update audio status indicator
+            updateAudioStatus(text, isError) {
+                const statusEl = document.getElementById('audioStatus');
+                if (statusEl) {
+                    statusEl.textContent = text;
+                    statusEl.className = 'audio-status' + (isError ? ' disabled' : '');
+                    
+                    // Auto-hide after success
+                    if (!isError && this.audioInitialized) {
+                        setTimeout(() => {
+                            statusEl.style.opacity = '0.3';
+                        }, 3000);
+                    }
+                }
+            },
+
+            // Enhanced speak function with mobile fixes
+            speak(text) {
+                if (!this.speechAvailable || !this.audioEnabled) {
+                    console.log('Speech not available or disabled');
+                    return;
+                }
+
+                // Clean the text
+                const cleanText = text.replace(/\*\*/g, '').replace(/<[^>]*>/g, '').trim();
+                
+                if (!cleanText) {
+                    console.log('No text to speak');
+                    return;
+                }
+
+                // Cancel any ongoing speech
+                try {
+                    speechSynthesis.cancel();
+                } catch (error) {
+                    console.log('Error canceling speech:', error);
+                }
+
+                // Wait a bit for cancel to complete on mobile
+                setTimeout(() => {
+                    this.speakText(cleanText);
+                }, this.isMobile ? 100 : 10);
+            },
+
+            // Actually speak the text
+            speakText(text) {
+                try {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    
+                    // Configure utterance
+                    utterance.lang = 'en-US';
+                    utterance.rate = this.isMobile ? 0.8 : 0.9; // Slightly slower on mobile
+                    utterance.pitch = 1;
+                    utterance.volume = 1;
+
+                    // Try to use a good English voice
+                    const voices = speechSynthesis.getVoices();
+                    const englishVoice = voices.find(voice => 
+                        voice.lang === 'en-US' || 
+                        voice.lang === 'en-GB' || 
+                        voice.lang.startsWith('en')
+                    );
+                    
+                    if (englishVoice) {
+                        utterance.voice = englishVoice;
+                    }
+
+                    // Error handling
+                    utterance.onerror = (event) => {
+                        console.log('Speech error:', event.error);
+                        this.updateAudioStatus('⚠️ Speech Error', true);
+                    };
+
+                    // Success feedback
+                    utterance.onstart = () => {
+                        this.updateAudioStatus('🔊 Speaking...', false);
+                    };
+
+                    utterance.onend = () => {
+                        this.updateAudioStatus('🔊 Audio Ready', false);
+                    };
+
+                    // Speak with additional mobile handling
+                    if (this.isMobile) {
+                        // On mobile, ensure we're not speaking too quickly after another utterance
+                        speechSynthesis.speak(utterance);
+                        
+                        // Fallback for iOS Safari
+                        setTimeout(() => {
+                            if (speechSynthesis.speaking === false && speechSynthesis.pending === false) {
+                                speechSynthesis.speak(utterance);
+                            }
+                        }, 100);
+                    } else {
+                        speechSynthesis.speak(utterance);
+                    }
+
+                } catch (error) {
+                    console.log('Error creating speech:', error);
+                    this.updateAudioStatus('❌ Speech Failed', true);
+                }
+            },
+
             // Article Exercise Functions
             startArticleExercise() {
                 // Initialize available indices for no-repeat system
@@ -910,9 +1113,7 @@
                     document.getElementById('articleAnswer').textContent : 
                     document.getElementById('articleTask').textContent;
                 
-                // Remove bold formatting for speech
-                const cleanSentence = currentSentence.replace(/\*\*/g, '');
-                this.speak(cleanSentence);
+                this.speak(currentSentence);
             },
             
             showArticleRules() {
@@ -1053,9 +1254,7 @@
                     document.getElementById('theExample').textContent : 
                     document.getElementById('aExample').textContent;
                 
-                // Remove bold formatting for speech
-                const cleanSentence = currentSentence.replace(/\*\*/g, '');
-                this.speak(cleanSentence);
+                this.speak(currentSentence);
             },
             
             showAvsTheRules() {
@@ -1324,19 +1523,7 @@
                 this.updateExerciseDisplay();
             },
             
-            // Audio functions
-            speak(text) {
-                if ('speechSynthesis' in window && this.audioEnabled) {
-                    window.speechSynthesis.cancel();
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'en-US';
-                    utterance.rate = 0.9;
-                    utterance.pitch = 1;
-                    utterance.volume = 1;
-                    window.speechSynthesis.speak(utterance);
-                }
-            },
-            
+            // Enhanced playAudio function
             playAudio() {
                 const sentences = [
                     document.getElementById('sentence1').textContent,
@@ -1350,7 +1537,7 @@
                     if (index < sentences.length) {
                         this.speak(sentences[index]);
                         index++;
-                        setTimeout(speakNext, 2000);
+                        setTimeout(speakNext, this.isMobile ? 3000 : 2500); // Longer pause on mobile
                     }
                 };
                 speakNext();
@@ -1522,7 +1709,7 @@
             }
         };
 
-        // Data Module
+        // Data Module (same as before, keeping it exactly the same)
         const data = {
             // A vs The exercise data
             avstheExamples: [
