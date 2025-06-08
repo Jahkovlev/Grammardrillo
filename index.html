@@ -684,6 +684,9 @@
     </style>
 </head>
 <body>
+    <!-- ResponsiveVoice fallback for mobile speech synthesis -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=FREE"></script>
+    
     <!-- Audio status indicator -->
     <div id="audioStatus" class="audio-status" title="Click for audio debug information">🔊 Loading Audio...</div>
 
@@ -863,6 +866,8 @@
             // Audio state
             audioInitialized: false,
             speechAvailable: false,
+            responsiveVoiceAvailable: false,
+            currentAudioMethod: null, // 'native', 'responsivevoice', or null
             isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
             
             // Article exercise state
@@ -897,23 +902,100 @@
                 this.showScreen('welcomeScreen');
             },
 
-            // Initialize audio system with mobile fixes
+            // Initialize audio system with mobile fixes and fallbacks
             initializeAudio() {
-                console.log('Initializing audio system...');
+                console.log('Initializing audio system with mobile fallbacks...');
                 
                 // Always set up the debug click handler first
                 this.setupAudioDebugHandler();
                 
-                // Check basic speech synthesis support with multiple methods
-                this.speechAvailable = this.detectSpeechSupport();
+                // Check multiple audio methods
+                this.detectAudioMethods();
                 
-                if (!this.speechAvailable) {
-                    console.log('Speech synthesis not supported');
+                if (!this.speechAvailable && !this.responsiveVoiceAvailable) {
+                    console.log('No audio methods available');
                     this.updateAudioStatus('❌ Click for Help', true);
                     return;
                 }
 
-                console.log('Speech synthesis API available');
+                // Determine which method to use
+                this.selectAudioMethod();
+                
+                console.log(`Using audio method: ${this.currentAudioMethod}`);
+                
+                // Initialize the selected method
+                if (this.currentAudioMethod === 'native') {
+                    this.initializeNativeSpeech();
+                } else if (this.currentAudioMethod === 'responsivevoice') {
+                    this.initializeResponsiveVoice();
+                }
+            },
+
+            // Detect all available audio methods
+            detectAudioMethods() {
+                // Check native speech synthesis
+                this.speechAvailable = this.detectSpeechSupport();
+                
+                // Check ResponsiveVoice availability
+                this.responsiveVoiceAvailable = this.detectResponsiveVoice();
+                
+                console.log('Audio methods detected:', {
+                    native: this.speechAvailable,
+                    responsiveVoice: this.responsiveVoiceAvailable
+                });
+            },
+
+            // Detect ResponsiveVoice availability
+            detectResponsiveVoice() {
+                try {
+                    // Check if ResponsiveVoice is loaded
+                    if (typeof responsiveVoice !== 'undefined' && responsiveVoice) {
+                        console.log('ResponsiveVoice detected');
+                        return true;
+                    }
+                } catch (error) {
+                    console.log('ResponsiveVoice not available:', error);
+                }
+                
+                // If not immediately available, set up a delayed check
+                setTimeout(() => {
+                    if (typeof responsiveVoice !== 'undefined' && responsiveVoice) {
+                        console.log('ResponsiveVoice loaded after delay');
+                        this.responsiveVoiceAvailable = true;
+                        
+                        // If we don't have native speech, switch to ResponsiveVoice
+                        if (!this.speechAvailable || !this.audioInitialized) {
+                            this.currentAudioMethod = 'responsivevoice';
+                            this.initializeResponsiveVoice();
+                        }
+                    }
+                }, 2000);
+                
+                return false;
+            },
+
+            // Select the best audio method for the current device
+            selectAudioMethod() {
+                if (this.isMobile) {
+                    // On mobile, prefer ResponsiveVoice for reliability
+                    if (this.responsiveVoiceAvailable) {
+                        this.currentAudioMethod = 'responsivevoice';
+                    } else if (this.speechAvailable) {
+                        this.currentAudioMethod = 'native';
+                    }
+                } else {
+                    // On desktop, prefer native for performance
+                    if (this.speechAvailable) {
+                        this.currentAudioMethod = 'native';
+                    } else if (this.responsiveVoiceAvailable) {
+                        this.currentAudioMethod = 'responsivevoice';
+                    }
+                }
+            },
+
+            // Initialize native speech synthesis
+            initializeNativeSpeech() {
+                console.log('Initializing native speech synthesis...');
                 
                 // Initialize speech synthesis on first user interaction
                 document.addEventListener('click', this.enableAudioOnFirstClick.bind(this), { once: true });
@@ -928,6 +1010,35 @@
                 this.checkVoicesWithRetry(0);
 
                 this.updateAudioStatus('🔊 Tap to Enable Audio', false);
+            },
+
+            // Initialize ResponsiveVoice
+            initializeResponsiveVoice() {
+                console.log('Initializing ResponsiveVoice...');
+                
+                // ResponsiveVoice doesn't need user interaction on mobile
+                if (typeof responsiveVoice !== 'undefined' && responsiveVoice) {
+                    this.audioInitialized = true;
+                    this.audioEnabled = true;
+                    this.updateAudioStatus('🔊 Audio Ready (RV)', false);
+                    
+                    // Auto-hide after success
+                    setTimeout(() => {
+                        const statusEl = document.getElementById('audioStatus');
+                        if (statusEl) statusEl.style.opacity = '0.3';
+                    }, 2000);
+                } else {
+                    this.updateAudioStatus('🔊 Tap to Enable Audio', false);
+                    
+                    // Set up user interaction to try again
+                    document.addEventListener('click', () => {
+                        if (typeof responsiveVoice !== 'undefined' && responsiveVoice && !this.audioInitialized) {
+                            this.audioInitialized = true;
+                            this.audioEnabled = true;
+                            this.updateAudioStatus('🔊 Audio Ready (RV)', false);
+                        }
+                    }, { once: true });
+                }
             },
 
             // Detect speech synthesis support with multiple methods
@@ -1214,7 +1325,9 @@
                     `• User Agent: ${userAgent.substring(0, 50)}...`,
                     ``,
                     `🔊 Audio System:`,
-                    `• Speech API Available: ${this.speechAvailable ? 'Yes' : 'No'}`,
+                    `• Native Speech API: ${this.speechAvailable ? 'Yes' : 'No'}`,
+                    `• ResponsiveVoice: ${this.responsiveVoiceAvailable ? 'Yes' : 'No'}`,
+                    `• Current Method: ${this.currentAudioMethod || 'None'}`,
                     `• Audio Initialized: ${this.audioInitialized ? 'Yes' : 'No'}`,
                     `• Audio Enabled: ${this.audioEnabled ? 'Yes' : 'No'}`
                 ];
@@ -1264,8 +1377,8 @@
                 // Add troubleshooting tips
                 info.push(``, `🛠️ TROUBLESHOOTING:`);
                 
-                if (!this.speechAvailable) {
-                    info.push(`❌ Speech API not supported in this browser`);
+                if (!this.speechAvailable && !this.responsiveVoiceAvailable) {
+                    info.push(`❌ No audio methods available`);
                     info.push(`💡 Solutions:`);
                     if (browser === 'Unknown' || browser.includes('WebView')) {
                         info.push(`  • Try opening in a proper browser (Chrome/Safari/Firefox)`);
@@ -1275,6 +1388,17 @@
                         info.push(`  • Try Safari on iOS/Mac`);
                         info.push(`  • Try Firefox as alternative`);
                         info.push(`  • Update your browser to latest version`);
+                        info.push(`  • Check internet connection (for ResponsiveVoice)`);
+                    }
+                } else if (this.responsiveVoiceAvailable) {
+                    info.push(`✅ ResponsiveVoice available - should work on mobile!`);
+                    if (!this.audioInitialized) {
+                        info.push(`💡 Try: Tapping anywhere to initialize audio`);
+                    } else {
+                        info.push(`💡 If not working:`);
+                        info.push(`  • Check device volume and mute settings`);
+                        info.push(`  • Check internet connection`);
+                        info.push(`  • Try tapping a 🔊 Play button`);
                     }
                 } else if (this.speechAvailable) {
                     try {
@@ -1298,11 +1422,7 @@
                             info.push(`  • Tap anywhere on screen to enable`);
                             info.push(`  • Check browser audio permissions`);
                         } else {
-                            info.push(`✅ Everything looks good!`);
-                            info.push(`💡 If still not working:`);
-                            info.push(`  • Check device volume and mute settings`);
-                            info.push(`  • Try different browser`);
-                            info.push(`  • Restart browser/device`);
+                            info.push(`✅ Native speech synthesis working!`);
                         }
                     } catch (error) {
                         info.push(`❌ Error checking voice system: ${error.message}`);
@@ -1316,6 +1436,7 @@
                     info.push(`• Close other apps using audio`);
                     info.push(`• Try Chrome or Safari browser`);
                     info.push(`• Don't use in-app browsers`);
+                    info.push(`• ResponsiveVoice fallback should work on most devices`);
                     if (location.protocol !== 'https:') {
                         info.push(`• HTTPS may be required for mobile audio`);
                     }
@@ -1353,11 +1474,13 @@
                 });
             },
 
-            // Enhanced speak function with mobile fixes and better error handling
+            // Enhanced speak function with multiple audio methods
             speak(text) {
-                if (!this.speechAvailable) {
-                    console.log('Speech synthesis not available');
-                    this.updateAudioStatus('❌ Speech Not Available', true);
+                // Clean the text
+                const cleanText = text.replace(/\*\*/g, '').replace(/<[^>]*>/g, '').trim();
+                
+                if (!cleanText) {
+                    console.log('No text to speak');
                     return;
                 }
 
@@ -1367,15 +1490,78 @@
                     return;
                 }
 
-                // Clean the text
-                const cleanText = text.replace(/\*\*/g, '').replace(/<[^>]*>/g, '').trim();
-                
-                if (!cleanText) {
-                    console.log('No text to speak');
+                console.log(`Speaking with ${this.currentAudioMethod}:`, cleanText);
+
+                // Use the appropriate speech method
+                if (this.currentAudioMethod === 'responsivevoice') {
+                    this.speakWithResponsiveVoice(cleanText);
+                } else if (this.currentAudioMethod === 'native') {
+                    this.speakWithNative(cleanText);
+                } else {
+                    // Try to auto-detect and use any available method
+                    if (this.responsiveVoiceAvailable) {
+                        this.currentAudioMethod = 'responsivevoice';
+                        this.speakWithResponsiveVoice(cleanText);
+                    } else if (this.speechAvailable) {
+                        this.currentAudioMethod = 'native';
+                        this.speakWithNative(cleanText);
+                    } else {
+                        console.log('No audio method available');
+                        this.updateAudioStatus('❌ No Audio Available', true);
+                    }
+                }
+            },
+
+            // Speak using ResponsiveVoice
+            speakWithResponsiveVoice(text) {
+                try {
+                    if (typeof responsiveVoice === 'undefined' || !responsiveVoice) {
+                        console.log('ResponsiveVoice not available');
+                        this.fallbackToNative(text);
+                        return;
+                    }
+
+                    // Cancel any ongoing speech
+                    if (responsiveVoice.isPlaying()) {
+                        responsiveVoice.cancel();
+                    }
+
+                    this.updateAudioStatus('🔊 Speaking...', false);
+
+                    // Use ResponsiveVoice to speak
+                    responsiveVoice.speak(text, "US English Female", {
+                        rate: this.isMobile ? 0.7 : 0.8,
+                        pitch: 1,
+                        volume: 1,
+                        onstart: () => {
+                            console.log('ResponsiveVoice speech started');
+                            this.updateAudioStatus('🔊 Speaking (RV)...', false);
+                        },
+                        onend: () => {
+                            console.log('ResponsiveVoice speech ended');
+                            this.updateAudioStatus('🔊 Audio Ready (RV)', false);
+                        },
+                        onerror: (error) => {
+                            console.log('ResponsiveVoice error:', error);
+                            this.handleSpeechError('responsivevoice-error');
+                            // Try native as fallback
+                            this.fallbackToNative(text);
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Error with ResponsiveVoice:', error);
+                    this.fallbackToNative(text);
+                }
+            },
+
+            // Speak using native speech synthesis
+            speakWithNative(text) {
+                if (!this.speechAvailable) {
+                    console.log('Native speech synthesis not available');
+                    this.fallbackToResponsiveVoice(text);
                     return;
                 }
-
-                console.log('Speaking:', cleanText);
 
                 // Cancel any ongoing speech
                 try {
@@ -1390,8 +1576,32 @@
                 // Wait for cancel to complete
                 const speakDelay = this.isMobile ? 150 : 50;
                 setTimeout(() => {
-                    this.speakText(cleanText);
+                    this.speakText(text);
                 }, speakDelay);
+            },
+
+            // Fallback from ResponsiveVoice to native
+            fallbackToNative(text) {
+                if (this.speechAvailable) {
+                    console.log('Falling back to native speech synthesis');
+                    this.currentAudioMethod = 'native';
+                    this.speakWithNative(text);
+                } else {
+                    console.log('No fallback audio method available');
+                    this.updateAudioStatus('❌ Speech Failed', true);
+                }
+            },
+
+            // Fallback from native to ResponsiveVoice
+            fallbackToResponsiveVoice(text) {
+                if (this.responsiveVoiceAvailable) {
+                    console.log('Falling back to ResponsiveVoice');
+                    this.currentAudioMethod = 'responsivevoice';
+                    this.speakWithResponsiveVoice(text);
+                } else {
+                    console.log('No fallback audio method available');
+                    this.updateAudioStatus('❌ Speech Failed', true);
+                }
             },
 
             // Actually speak the text with comprehensive error handling
