@@ -604,19 +604,32 @@
             user-select: none;
             max-width: 200px;
             text-align: center;
+            border: 2px solid transparent;
         }
 
         .audio-status:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.3);
         }
 
         .audio-status.disabled {
             background: #f56565;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .audio-status.disabled:hover {
             background: #e53e3e;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 2px 10px rgba(245, 101, 101, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(245, 101, 101, 0.6);
+            }
         }
         
         @media (max-width: 480px) {
@@ -672,7 +685,7 @@
 </head>
 <body>
     <!-- Audio status indicator -->
-    <div id="audioStatus" class="audio-status">🔊 Audio Loading...</div>
+    <div id="audioStatus" class="audio-status" title="Click for audio debug information">🔊 Loading Audio...</div>
 
     <div class="container">
         <!-- Welcome Screen -->
@@ -875,6 +888,11 @@
             
             // Initialize
             init() {
+                // Set up debug handler first thing
+                setTimeout(() => {
+                    this.setupAudioDebugHandler();
+                }, 100);
+                
                 this.initializeAudio();
                 this.showScreen('welcomeScreen');
             },
@@ -883,12 +901,15 @@
             initializeAudio() {
                 console.log('Initializing audio system...');
                 
-                // Check basic speech synthesis support
-                this.speechAvailable = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+                // Always set up the debug click handler first
+                this.setupAudioDebugHandler();
+                
+                // Check basic speech synthesis support with multiple methods
+                this.speechAvailable = this.detectSpeechSupport();
                 
                 if (!this.speechAvailable) {
                     console.log('Speech synthesis not supported');
-                    this.updateAudioStatus('❌ Audio Not Supported', true);
+                    this.updateAudioStatus('❌ Click for Help', true);
                     return;
                 }
 
@@ -907,6 +928,76 @@
                 this.checkVoicesWithRetry(0);
 
                 this.updateAudioStatus('🔊 Tap to Enable Audio', false);
+            },
+
+            // Detect speech synthesis support with multiple methods
+            detectSpeechSupport() {
+                // Method 1: Check if APIs exist
+                if (!('speechSynthesis' in window)) {
+                    console.log('speechSynthesis not in window');
+                    return false;
+                }
+                
+                if (!('SpeechSynthesisUtterance' in window)) {
+                    console.log('SpeechSynthesisUtterance not in window');
+                    return false;
+                }
+                
+                // Method 2: Try to create an utterance
+                try {
+                    const testUtterance = new SpeechSynthesisUtterance();
+                    if (!testUtterance) {
+                        console.log('Failed to create SpeechSynthesisUtterance');
+                        return false;
+                    }
+                } catch (error) {
+                    console.log('Error creating SpeechSynthesisUtterance:', error);
+                    return false;
+                }
+                
+                // Method 3: Check if speechSynthesis has required methods
+                if (typeof speechSynthesis.speak !== 'function') {
+                    console.log('speechSynthesis.speak is not a function');
+                    return false;
+                }
+                
+                if (typeof speechSynthesis.getVoices !== 'function') {
+                    console.log('speechSynthesis.getVoices is not a function');
+                    return false;
+                }
+                
+                console.log('All speech synthesis checks passed');
+                return true;
+            },
+
+            // Set up the debug click handler - always available
+            setupAudioDebugHandler() {
+                const statusEl = document.getElementById('audioStatus');
+                if (statusEl) {
+                    console.log('Setting up audio debug handler');
+                    
+                    // Remove any existing handlers
+                    statusEl.onclick = null;
+                    
+                    // Add the debug handler
+                    statusEl.onclick = (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        console.log('Audio debug clicked');
+                        this.showAudioDebugInfo();
+                    };
+                    
+                    // Make it more obvious it's clickable
+                    statusEl.style.cursor = 'pointer';
+                    statusEl.title = 'Click for audio debug information';
+                    
+                    console.log('Audio debug handler set up successfully');
+                } else {
+                    console.log('Audio status element not found, retrying...');
+                    setTimeout(() => {
+                        this.setupAudioDebugHandler();
+                    }, 500);
+                }
             },
 
             // Check for voices with retry mechanism
@@ -1081,10 +1172,8 @@
                     statusEl.textContent = text;
                     statusEl.className = 'audio-status' + (isError ? ' disabled' : '');
                     
-                    // Add click handler for debugging info
-                    statusEl.onclick = () => {
-                        this.showAudioDebugInfo();
-                    };
+                    // Always ensure the debug handler is attached
+                    this.setupAudioDebugHandler();
                     
                     // Auto-hide success states
                     if (!isError && this.audioInitialized) {
@@ -1100,9 +1189,11 @@
                 console.log('Audio Status:', text);
             },
 
-            // Show detailed audio debug information
+            // Show detailed audio debug information - works even when audio not supported
             showAudioDebugInfo() {
-                const voices = speechSynthesis.getVoices();
+                console.log('Showing audio debug info...');
+                
+                // Get basic info even if speech synthesis isn't supported
                 const userAgent = navigator.userAgent;
                 
                 // Detect browser
@@ -1112,9 +1203,6 @@
                 else if (userAgent.includes('Firefox')) browser = 'Firefox';
                 else if (userAgent.includes('Edg')) browser = 'Edge';
                 
-                // Get English voices
-                const englishVoices = voices.filter(v => v.lang.startsWith('en'));
-                
                 let info = [
                     `🔧 AUDIO DEBUG INFO`,
                     ``,
@@ -1123,27 +1211,53 @@
                     `• Mobile: ${this.isMobile ? 'Yes' : 'No'}`,
                     `• HTTPS: ${location.protocol === 'https:' ? 'Yes' : 'No'}`,
                     `• URL: ${location.hostname}`,
+                    `• User Agent: ${userAgent.substring(0, 50)}...`,
                     ``,
                     `🔊 Audio System:`,
                     `• Speech API Available: ${this.speechAvailable ? 'Yes' : 'No'}`,
                     `• Audio Initialized: ${this.audioInitialized ? 'Yes' : 'No'}`,
-                    `• Audio Enabled: ${this.audioEnabled ? 'Yes' : 'No'}`,
-                    ``,
-                    `🎤 Voice System:`,
-                    `• Total Voices: ${voices.length}`,
-                    `• English Voices: ${englishVoices.length}`,
-                    `• Currently Speaking: ${speechSynthesis.speaking ? 'Yes' : 'No'}`,
-                    `• Speech Pending: ${speechSynthesis.pending ? 'Yes' : 'No'}`,
-                    `• Speech Paused: ${speechSynthesis.paused ? 'Yes' : 'No'}`
+                    `• Audio Enabled: ${this.audioEnabled ? 'Yes' : 'No'}`
                 ];
-                
-                if (englishVoices.length > 0) {
-                    info.push(``, `🇺🇸 Available English Voices:`);
-                    englishVoices.slice(0, 5).forEach(voice => {
-                        info.push(`• ${voice.name} (${voice.lang})`);
-                    });
-                    if (englishVoices.length > 5) {
-                        info.push(`• ... and ${englishVoices.length - 5} more`);
+
+                // Add speech synthesis specific info if available
+                if (this.speechAvailable) {
+                    try {
+                        const voices = speechSynthesis.getVoices();
+                        const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+                        
+                        info.push(
+                            ``,
+                            `🎤 Voice System:`,
+                            `• Total Voices: ${voices.length}`,
+                            `• English Voices: ${englishVoices.length}`,
+                            `• Currently Speaking: ${speechSynthesis.speaking ? 'Yes' : 'No'}`,
+                            `• Speech Pending: ${speechSynthesis.pending ? 'Yes' : 'No'}`,
+                            `• Speech Paused: ${speechSynthesis.paused ? 'Yes' : 'No'}`
+                        );
+                        
+                        if (englishVoices.length > 0) {
+                            info.push(``, `🇺🇸 Available English Voices:`);
+                            englishVoices.slice(0, 5).forEach(voice => {
+                                info.push(`• ${voice.name} (${voice.lang})`);
+                            });
+                            if (englishVoices.length > 5) {
+                                info.push(`• ... and ${englishVoices.length - 5} more`);
+                            }
+                        }
+                    } catch (error) {
+                        info.push(``, `❌ Error accessing voice system: ${error.message}`);
+                    }
+                } else {
+                    info.push(
+                        ``,
+                        `❌ Speech Synthesis Check:`,
+                        `• 'speechSynthesis' in window: ${'speechSynthesis' in window}`,
+                        `• 'SpeechSynthesisUtterance' in window: ${'SpeechSynthesisUtterance' in window}`
+                    );
+                    
+                    if ('speechSynthesis' in window) {
+                        info.push(`• speechSynthesis.speak exists: ${typeof speechSynthesis.speak === 'function'}`);
+                        info.push(`• speechSynthesis.getVoices exists: ${typeof speechSynthesis.getVoices === 'function'}`);
                     }
                 }
                 
@@ -1152,33 +1266,91 @@
                 
                 if (!this.speechAvailable) {
                     info.push(`❌ Speech API not supported in this browser`);
-                    info.push(`💡 Try: Chrome, Safari, or Firefox`);
-                } else if (voices.length === 0) {
-                    info.push(`❌ No voices available`);
-                    info.push(`💡 Try: Refreshing the page, checking internet`);
-                } else if (englishVoices.length === 0) {
-                    info.push(`❌ No English voices found`);
-                    info.push(`💡 Try: Installing English language pack`);
-                } else if (!this.audioInitialized) {
-                    info.push(`❌ Audio not initialized`);
-                    info.push(`💡 Try: Tapping anywhere on screen first`);
-                } else {
-                    info.push(`✅ Everything looks good!`);
-                    info.push(`💡 If still not working, try different browser`);
-                }
-                
-                if (this.isMobile) {
-                    info.push(``, `📱 Mobile Tips:`);
-                    info.push(`• Make sure volume is up`);
-                    info.push(`• Check if silent mode is off`);
-                    info.push(`• Try Chrome or Safari browser`);
-                    if (location.protocol !== 'https:') {
-                        info.push(`• HTTPS may be required for audio`);
+                    info.push(`💡 Solutions:`);
+                    if (browser === 'Unknown' || browser.includes('WebView')) {
+                        info.push(`  • Try opening in a proper browser (Chrome/Safari/Firefox)`);
+                        info.push(`  • Don't use in-app browsers (Instagram, Facebook, etc.)`);
+                    } else {
+                        info.push(`  • Try Chrome (best speech support)`);
+                        info.push(`  • Try Safari on iOS/Mac`);
+                        info.push(`  • Try Firefox as alternative`);
+                        info.push(`  • Update your browser to latest version`);
+                    }
+                } else if (this.speechAvailable) {
+                    try {
+                        const voices = speechSynthesis.getVoices();
+                        const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+                        
+                        if (voices.length === 0) {
+                            info.push(`❌ No voices available`);
+                            info.push(`💡 Solutions:`);
+                            info.push(`  • Refresh the page and wait a moment`);
+                            info.push(`  • Check internet connection`);
+                            info.push(`  • Try different browser`);
+                        } else if (englishVoices.length === 0) {
+                            info.push(`❌ No English voices found`);
+                            info.push(`💡 Solutions:`);
+                            info.push(`  • Install English language pack`);
+                            info.push(`  • Check system language settings`);
+                        } else if (!this.audioInitialized) {
+                            info.push(`❌ Audio not initialized`);
+                            info.push(`💡 Solutions:`);
+                            info.push(`  • Tap anywhere on screen to enable`);
+                            info.push(`  • Check browser audio permissions`);
+                        } else {
+                            info.push(`✅ Everything looks good!`);
+                            info.push(`💡 If still not working:`);
+                            info.push(`  • Check device volume and mute settings`);
+                            info.push(`  • Try different browser`);
+                            info.push(`  • Restart browser/device`);
+                        }
+                    } catch (error) {
+                        info.push(`❌ Error checking voice system: ${error.message}`);
                     }
                 }
                 
-                // Show the debug info
-                alert(info.join('\n'));
+                if (this.isMobile) {
+                    info.push(``, `📱 Mobile-Specific Tips:`);
+                    info.push(`• Make sure volume is up`);
+                    info.push(`• Turn off silent/vibrate mode`);
+                    info.push(`• Close other apps using audio`);
+                    info.push(`• Try Chrome or Safari browser`);
+                    info.push(`• Don't use in-app browsers`);
+                    if (location.protocol !== 'https:') {
+                        info.push(`• HTTPS may be required for mobile audio`);
+                    }
+                }
+                
+                // Show the debug info in an alert
+                try {
+                    alert(info.join('\n'));
+                } catch (error) {
+                    // Fallback if alert fails
+                    console.log('Debug Info:', info.join('\n'));
+                    
+                    // Try to show in a different way
+                    const debugText = info.join('\n');
+                    if (confirm('Audio Debug Info (click OK to copy to clipboard):\n\n' + debugText.substring(0, 500) + '...')) {
+                        // Try to copy to clipboard
+                        if (navigator.clipboard) {
+                            navigator.clipboard.writeText(debugText).catch(() => {
+                                console.log('Could not copy to clipboard');
+                            });
+                        }
+                    }
+                }
+                
+                // Also log comprehensive info to console for developers
+                console.log('Audio Debug Info:', {
+                    browser,
+                    isMobile: this.isMobile,
+                    speechAvailable: this.speechAvailable,
+                    audioInitialized: this.audioInitialized,
+                    audioEnabled: this.audioEnabled,
+                    speechSynthesisExists: 'speechSynthesis' in window,
+                    speechSynthesisUtteranceExists: 'SpeechSynthesisUtterance' in window,
+                    userAgent: userAgent
+                });
             },
 
             // Enhanced speak function with mobile fixes and better error handling
